@@ -8,12 +8,6 @@
 #define MAX_CHARS (LAST_CHAR - FIRST_CHAR)
 #define MAX_DIGRAMS (LAST_CHAR - FIRST_CHAR) * (LAST_CHAR - FIRST_CHAR)
 
-#define NEWLINE '\n'
-#define IN_WORD 1
-
-#define IN_LINE_COMMENT 1
-#define IN_BLOCK_COMMENT 2
-
 #define TEST 1   // 1 dla testowania, 0 dla automatycznej oceny
 
 int count[MAX_DIGRAMS] = { 0 };
@@ -47,7 +41,7 @@ void wc(int *nl, int *nw, int *nc, FILE *stream){
     int characters = 0;
     int isWord = 0;
     for (int nextChar = getc(stream); nextChar != EOF; nextChar = getc(stream)) {
-        if (nextChar == NEWLINE) {
+        if (nextChar == '\n') {
             lines++;
             if (isWord) words++;
             isWord = 0;
@@ -70,13 +64,12 @@ void wc(int *nl, int *nw, int *nc, FILE *stream){
 // cardinalities (decreasing order). Set n_char and cnt to the char_no - th char
 // in the sorted list and its cardinality respectively
 void char_count(int char_no, int *n_char, int *cnt, FILE *stream){
-    for (int nextChar = getc(stream); nextChar != EOF; nextChar = getc(stream)) {
+    for (int nextChar = getc(stream); nextChar != EOF; nextChar = getc(stream))
         if (nextChar >= FIRST_CHAR && nextChar < LAST_CHAR) count[nextChar - FIRST_CHAR]++;
-    }
     int charIndices[MAX_CHARS];
     for (int i = 0; i < MAX_CHARS; i++) charIndices[i] = i;
     qsort(charIndices, MAX_CHARS, sizeof(int), cmp);
-    resultChar = charIndices[char_no - 1];
+    int resultChar = charIndices[char_no - 1];
     *n_char = resultChar + FIRST_CHAR;
     *cnt = count[resultChar];
 }
@@ -87,11 +80,51 @@ void char_count(int char_no, int *n_char, int *cnt, FILE *stream){
 // digram[1] to the first and the second char in the digram_no - th digram_char
 // in the sorted list. Set digram[2] to its cardinality.
 void digram_count(int digram_no, int digram[], FILE *stream){
+	int prev = getc(stream);
+    for (int nextChar = getc(stream); nextChar != EOF; nextChar = getc(stream)) {
+        if (nextChar >= FIRST_CHAR && nextChar < LAST_CHAR && prev >= FIRST_CHAR && prev < LAST_CHAR)
+			count[((prev - FIRST_CHAR) * MAX_CHARS) + (nextChar - FIRST_CHAR)]++;
+		prev = nextChar;
+	}
+    int digramIndices[MAX_DIGRAMS];
+    for (int i = 0; i < MAX_DIGRAMS; i++) digramIndices[i] = i;
+    qsort(digramIndices, MAX_DIGRAMS, sizeof(int), cmp_di);
+    int resultDigram = digramIndices[digram_no - 1];
+    digram[0] = ((int) (resultDigram / MAX_CHARS)) + FIRST_CHAR;
+	digram[1] = (resultDigram % MAX_CHARS) + FIRST_CHAR;
+	digram[2] = count[resultDigram];
 }
 
 // Count block and line comments in the text read from stream. Set
 // line_comment_counter and block_comment_counter accordingly
 void find_comments(int *line_comment_counter, int *block_comment_counter, FILE *stream){
+	int lineCommentsAmount = 0;
+	int blockCommentsAmount = 0;
+	int inLineComment = 0;
+	int inBlockComment = 0;
+	int prev = getc(stream);
+	for (int nextChar = getc(stream); nextChar != EOF; nextChar = getc(stream)) {
+		if (inLineComment || inBlockComment) {
+			if (inLineComment && nextChar == '\n') inLineComment = 0;
+			else if (inBlockComment > 1 && prev == '*' && nextChar == '/') inBlockComment = 0;
+			else if (inBlockComment) inBlockComment++;
+		}
+		else {
+			if (prev == '/') {
+				if (nextChar == '/') {
+					lineCommentsAmount++;
+					inLineComment = 1;
+				}
+				else if (nextChar == '*') {
+					blockCommentsAmount++;
+					inBlockComment = 1;
+				}
+			}
+		}
+		prev = nextChar;
+	}
+	*line_comment_counter = lineCommentsAmount;
+	*block_comment_counter = blockCommentsAmount;
 }
 
 #define MAX_LINE 128
