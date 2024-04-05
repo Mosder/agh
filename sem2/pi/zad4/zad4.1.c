@@ -70,9 +70,15 @@ void wc(int *nl, int *nw, int *nc, FILE *stream){
 // cardinalities (decreasing order). Set n_char and cnt to the char_no - th char
 // in the sorted list and its cardinality respectively
 void char_count(int char_no, int *n_char, int *cnt, FILE *stream){
-    for (int nextChar = getc(stream); nextChar != EOF; nextChat = getc(stream)) {
+    for (int nextChar = getc(stream); nextChar != EOF; nextChar = getc(stream)) {
         if (nextChar >= FIRST_CHAR && nextChar < LAST_CHAR) count[nextChar - FIRST_CHAR]++;
     }
+    int charIndices[MAX_CHARS];
+    for (int i = 0; i < MAX_CHARS; i++) charIndices[i] = i;
+    qsort(charIndices, MAX_CHARS, sizeof(int), cmp);
+    resultChar = charIndices[char_no - 1];
+    *n_char = resultChar + FIRST_CHAR;
+    *cnt = count[resultChar];
 }
 
 // count how many times each digram (a pair of characters, from [FIRST_CHAR,
