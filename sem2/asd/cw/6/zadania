@@ -1,0 +1,7 @@
+1. 
+2. Czy istnieje wierzchołek w grafie skierowanym, taki że, można z niego dotrzeć do każdego innego
+3. Czy istnieje krawędź w najkrótszej ścieżce pomiędzy dwoma wierzchołkami,
+    która po jej usunięciu wydłuży ścieżkę (lub przestanie istnieć)
+4. Znalezienie cyklu Eulera (macierz adjacencji)
+5. Miasta i oazy
+6. Znajdowanie mostów

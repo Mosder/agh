@@ -1,0 +1,8 @@
+1. merge sort na seriach naturalnych
+2. liczba inwersji w liście
+3. lider ciągu - więcej niż połowa miejsc w tablicy zajęta przez jedną liczbę (nie musi być)
+4. pojemniki z wodą
+5. m przedziałów - [a(i); b(i)]
+    szukamy przedziału, który zawiera najwięcej innych przedziałów
+    przedziały różne i się niestykają w zaczęciach/końcach
+

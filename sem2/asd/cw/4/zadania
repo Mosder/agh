@@ -1,0 +1,10 @@
+1. Posortować liniowo n elementów o wartościach z [0, n^2 - 1]
+2. 2 słowa A i B o długości n, każde nad alfabetem o długości k.
+    Sprawdzić czy są anagramami
+3. Sortowanie n liczb o wartościach ze zbioru licznego na logn
+4. Pewien eksperyment fizyczne generuje stosunkowo szybko pewne liczby z 10^9-1
+    ... coś tam
+5. n liczb parami różnych, znaleźć x i y, że y-x to max i nie ma takiego z, że x<z<y
+6. n elementów - każdy jeden z k kolorów, znaleźć i oraz j, że:
+    w elementach A[i],A[i+1],A[i+2],...,A[j] wystąpią
+    j - i jest najmniejsze

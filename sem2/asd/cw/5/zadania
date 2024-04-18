@@ -1,0 +1,6 @@
+1. Sprawdzenie czy graf jest dwudzielny (macierz adiacencji)
+2. Czy graf jest spójny (lista sąsiedztwa)
+3. Jakiś łatwy dfs
+4. Czy jest cykl długości 4 w grafie (macierz adiacencji)
+5. Czy w grafie skierowanym jest wierzchołek bez wychodzących krawędzi
+    i z krawędzią do niego od każdego innego wierzchołka (macierz adjecencji)

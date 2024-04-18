@@ -1,0 +1,11 @@
+1. bubble sort na arrayu
+2. selection sort na linked list
+3. min i max listy przez 3/2 porównań
+4. find i,j: T[j]+T[i] = x
+    T - sorted array; x - number
+    assume there is a pair fullfilling
+5. odwrócenie link listy
+6. A = [a0, a1, ..., ak] sorted
+    wartości od 0 do k, len A = n, k > n
+    Znaleźć pierwsze i: A[i]!=ai
+

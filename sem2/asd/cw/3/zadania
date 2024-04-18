@@ -1,0 +1,7 @@
+1. quicksort bez rekurencji przy użyciu stosu
+2. znalezienie 4. największego elementu (z użyciem typu quicksorta i partition)
+3. dodawanie elementu do kopca (i zrobienie, żeby nadal był git)
+4. scalanie k posortowanych list w oparciu o kopca
+5. stworzyć strukturę, która wstawia, usuwa najmniejszy i największy element.
+    wszystkie 3 operacje w czasie O(logn) - użycie heap max i min
+6. 5. ale wstawia i usuwa mediane
