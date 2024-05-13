@@ -158,20 +158,12 @@ typedef struct {
 } Person;
 
 typedef struct {
-       char *par_name;
-       int index;
+    char *par_name;
+    int index;
+    int childrenAmount;
 } Parent;    // strukturę można rozbudować o pole liczby dzieci
 
 const Date primo_date = { 28, 10, 2011 }; // Data zmiany kolejności sukcesji
-
-int fill_indices_tab(Parent *idx_tab, Person *pers_tab, int size) {
-}
-
-void persons_shiftings(Person *person_tab, int size, Parent *idx_tab, int no_parents) {
-}
-
-int cleaning(Person *person_tab,int n) {
-}
 
 void print_person(const Person *p) {
     printf("%s\n", p->name);
@@ -182,7 +174,85 @@ void print_persons(const Person *person_tab, int n) {
     return;
 }
 
+int strcmp2(const char *s1, const char *s2) {
+    if (s1 == NULL) return -1;
+    if (s2 == NULL) return 1;
+    return strcmp(s1, s2);
+}
+
+int comparePretendents(const void *p1, const void *p2) {
+    Person person1 = *(Person*)p1;
+    Person person2 = *(Person*)p2;
+    int result = strcmp2(person1.parent, person2.parent);
+    if (result == 0) {
+        if (compareDates(person1.born, primo_date) < 0 && compareDates(person2.born, primo_date) < 0)
+            result = person2.bits.sex - person1.bits.sex;
+        if (result == 0)
+            result = compareDates(person1.born, person2.born);
+    }
+    return result;
+}
+
+int compareParents(const void *p1, const void* p2) {
+    return strcmp2(((Parent*)p1)->par_name, ((Parent*)p2)->par_name);
+}
+
+int fill_indices_tab(Parent *idx_tab, Person *pers_tab, int size) {
+    int parentsTabSize = 0;
+    for (int i = 1; i < size; i++) {
+        Parent newParent = {
+            .par_name = pers_tab[i].parent,
+            .index = i,
+            .childrenAmount = 1
+        };
+        Parent *ptr = bsearch(&newParent, idx_tab, parentsTabSize, sizeof(Parent), compareParents);
+        if (ptr == NULL)
+            idx_tab[parentsTabSize++] = newParent;
+        else
+            ptr->childrenAmount++;
+    }
+    return parentsTabSize;
+}
+
+void persons_shiftings(Person *person_tab, int size, Parent *idx_tab, int no_parents) {
+    for (int i = 0; i < size; i++) {
+        Parent sought = {.par_name = person_tab[i].name};
+        Parent *parent = bsearch(&sought, idx_tab, no_parents, sizeof(Parent), compareParents);
+        if (parent != NULL) {
+            int moveAmount = 0;
+            for (int j = 0; j < no_parents; j++) {
+                if (strcmp2(idx_tab[j].par_name, person_tab[i].parent) == 0) {
+                    idx_tab[j].index++;
+                    idx_tab[j].childrenAmount--;
+                }
+                if (idx_tab[j].index > i && idx_tab[j].index < parent->index) {
+                    idx_tab[j].index += parent->childrenAmount;
+                    moveAmount += idx_tab[j].childrenAmount;
+                }
+            }
+            Person personsCopy[moveAmount];
+            memmove(personsCopy, person_tab + i + 1, moveAmount * sizeof(Person));
+            memmove(person_tab + i + 1, person_tab + parent->index, parent->childrenAmount * sizeof(Person));
+            memmove(person_tab + i + 1 + parent->childrenAmount, personsCopy, moveAmount * sizeof(Person));
+            parent->index = i + 1;
+        }
+    }
+}
+
+int cleaning(Person *person_tab,int n) {
+    int size = n;
+    for (int i = n-1; i >= 0; i--)
+        if (person_tab[i].bits.pretendent == 0)
+            memmove(person_tab + i, person_tab + i + 1, (--size-i) * sizeof(Person));
+    return size;
+}
+
 int create_list(Person *person_tab, int n) {
+    qsort(person_tab, n, sizeof(Person), comparePretendents);
+    Parent parentsTab[n];
+    int parentsTabSize = fill_indices_tab(parentsTab, person_tab, n);
+    persons_shiftings(person_tab, n, parentsTab, parentsTabSize);
+    return cleaning(person_tab, n);
 }
 
 ////////////////////////////////////////////////////////////////
