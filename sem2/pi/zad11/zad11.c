@@ -8,7 +8,7 @@
 #define MEMORY_ALLOCATION_ERROR  -1
 #define FILE_OPEN_ERROR          -2
 #define LIST_ERROR               -3
-#define TEST 1               // 1 dla testowania, 0 dla automatycznej oceny
+#define TEST 0               // 1 dla testowania, 0 dla automatycznej oceny
 
 typedef struct tagListElement {
     struct tagListElement *next;
@@ -157,12 +157,12 @@ void insertInOrder(List *list, void *a) {
     }
     else {
         if (list->compareData(insertPoint->data, newElement->data) == 0) {
-            if (list->modify) list->modify(insertPoint->data);
+            if (list->modifyData) list->modifyData(insertPoint->data);
             list->freeData(a);
             free(newElement);
         }
         else {
-            if (list->tail = insertPoint) list->tail = newElement;
+            if (list->tail == insertPoint) list->tail = newElement;
             newElement->next = insertPoint->next;
             insertPoint->next = newElement;
             list->size++;
@@ -198,16 +198,22 @@ void pushBack_v0(List *list, void *data) {
 typedef int DataInt;
 
 void dump_int(const void *d) {
+    printf("%i ", *(DataInt*)d);
 }
 
 void free_int(void *d) {
+    free((DataInt*)d);
 }
 
 int cmp_int(const void *a, const void *b) {
+    return *(DataInt*)a - *(DataInt*)b;
 }
 
 // Przydziela pamięć i zapisuje w niej daną o wartości v
 void *create_data_int(int v) {
+    DataInt *data = safe_malloc(sizeof(DataInt));
+    *data = v;
+    return data;
 }
 
 //////  Dla zadania 11.1.3 i 11.1.4
@@ -219,29 +225,44 @@ typedef struct DataWord {
 } DataWord;
 
 void dump_word (const void *d) {
+    printf("%s ", ((DataWord*)d)->word);
 }
 
 void free_word(void *d) {
+    free((DataWord*)d);
 }
 
 int cmp_word_alphabet(const void *a, const void *b) {
+    return strcmp(((DataWord*)a)->word, ((DataWord*)b)->word);
 }
 
 int cmp_word_counter(const void *a, const void *b) {
+    return ((DataWord*)a)->counter - ((DataWord*)b)->counter;
 }
 
 void modify_word(void *a) {
+    ((DataWord*)a)->counter++;
 }
 
 // Wypisz dane elementów spełniających warunek równości sprawdzany funkcją 
 // wskazywaną w polu compareData nagłówka listy
 void dumpList_word_if(List *plist, int n) {
+    DataWord *testData = safe_malloc(sizeof(DataWord));
+    testData->word = NULL;
+    testData->counter = n;
+    for (ListElement *current = plist->head; current; current = current->next)
+        if (plist->compareData(current->data, testData) == 0) plist->dumpData(current->data);
 }
 
 // Przydziela pamięć dla łańcucha string i struktury typu DataWord.
 // Do przydzielonej pamięci wpisuje odpowiednie dane.
 // Zwraca adres struktury.
 void *create_data_word(char *string, int counter) {
+    DataWord *data = safe_malloc(sizeof(DataWord));
+    data->word = safe_strdup(string);
+    data->counter = counter;
+    for (int i = 0; data->word[i]; i++) data->word[i] = tolower(data->word[i]);
+    return data;
 }
 
 //////////////////////////////////////////////////
