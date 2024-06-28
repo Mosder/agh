@@ -10,7 +10,7 @@ def kstrong( T, k):
         F[i][0] = max(F[i-1][0] + T[i], T[i])
     for i in range(1, n):
         for j in range(1, k+1):
-            F[i][j] = max(F[i-1][j-1], F[i-1][j] + T[i], T[i])
+            F[i][j] = max(F[i-1][j-1], F[i-1][j] + T[i])
     maxVal = 0
     for i in range(n):
         for j in range(k + 1):
