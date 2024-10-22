@@ -63,7 +63,7 @@ def dijkstraSolution(V, L, start):
                 q.put((-1 * mn, u))
     return cheapest[1]
 
-graph = "graphs/" + input("Graph name: ")
+graph = "graphs/lab1/" + input("Graph name: ")
 if isfile(graph):
     V, L = loadWeightedGraph(graph)
     exp = int(readSolution(graph))
