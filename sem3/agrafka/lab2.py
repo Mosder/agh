@@ -1,16 +1,18 @@
-from dimacs import loadDirectedWeightedGraph, readSolution
+from dimacs import loadDirectedWeightedGraph
 from math import inf
-from os.path import isfile
-from os import listdir
 from collections import deque
+from tester import Tester
+from graphClass import Graph
 
-def edgeListToAdjMatrix(vertexAmount, edgeList):
+def edgeListToAdjMatrix(vertexAmount, edgeList, directed=True):
     adjMatrix = [[0 for _ in range(vertexAmount)] for _ in range(vertexAmount)]
     adjVertices = [set() for _ in range(vertexAmount)]
     for v, u, w in edgeList:
         v -= 1
         u -= 1
         adjMatrix[v][u] = w
+        if not directed:
+            adjMatrix[u][v] = w
         adjVertices[v].add(u)
         adjVertices[u].add(v)
     return adjMatrix, adjVertices
@@ -53,9 +55,9 @@ def getExtPathBFS(adjMatrix, adjVertices, startNode, endNode):
                 q.append(u)
     return None
 
-def getMaxFlow(vertexAmount, edgeList, startNode=0, endNode=None, dfs=False):
-    if endNode is None: endNode = vertexAmount - 1
-    adjMatrix, adjVertices = edgeListToAdjMatrix(vertexAmount, edgeList)
+def getMaxFlow(graph: Graph, dfs=False, startNode=0, endNode=None):
+    adjMatrix, adjVertices = graph.data
+    if endNode is None: endNode = len(adjMatrix) - 1
     if dfs:
         pathParents = getExtPathDFS(adjMatrix, adjVertices, startNode, endNode)
     else:
@@ -80,23 +82,9 @@ def getMaxFlow(vertexAmount, edgeList, startNode=0, endNode=None, dfs=False):
             pathParents = getExtPathBFS(adjMatrix, adjVertices, startNode, endNode)
     return maxFlow
 
-def testGraph(graphName, dfs=False):
-    graph = "graphs/lab2/flow/" + graphName
-    if isfile(graph):
-        vAmount, edgeList = loadDirectedWeightedGraph(graph)
-        sol = int(readSolution(graph))
-        res = getMaxFlow(vAmount, edgeList, dfs=dfs)
-        print(f"Solution: {sol}")
-        print(f"Result: {res} ({'ok' if sol == res else 'wrong'})")
-    else:
-        print("Graph doesn't exist")
+def loadGraph(graphPath):
+    return edgeListToAdjMatrix(*loadDirectedWeightedGraph(graphPath))
 
-inp = input("Graph name / all (:q to quit): ")
-while inp != ":q":
-    if inp == "all":
-        for graph in listdir("graphs/lab2/flow"):
-            print(graph)
-            testGraph(graph)
-    else:
-        testGraph(inp)
-    inp = input("Graph name (:q to quit): ")
+if __name__ == "__main__":
+    tester = Tester("graphs/lab2/flow/", loadGraph, getMaxFlow)
+    tester.continousTesting()

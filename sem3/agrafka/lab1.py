@@ -1,7 +1,8 @@
 from queue import PriorityQueue
-from dimacs import loadWeightedGraph, readSolution
+from dimacs import loadWeightedGraph
 from math import inf
-from os.path import isfile
+from graphClass import Graph
+from tester import Tester
 
 class FindUnionNode:
     def __init__(self, value):
@@ -31,7 +32,8 @@ def printEdges(L):
 def sortEdgesByWeight(L, desc=True):
     return sorted(L,key=lambda x: x[2],reverse=desc)
 
-def findUnionSolution(V, L):
+def findUnionSolution(graph: Graph):
+    V, L = graph.data
     L = sortEdgesByWeight(L)
     findUnionNodes = []
     for vertex in range(V):
@@ -48,7 +50,8 @@ def edgeListToAdjList(V, L):
         adjList[edge[1] - 1].append((edge[0] - 1, edge[2]))
     return adjList
 
-def dijkstraSolution(V, L, start):
+def dijkstraSolution(graph: Graph, start=0):
+    V, L = graph.data
     adjList = edgeListToAdjList(V, L)
     cheapest = [0] * V
     q = PriorityQueue()
@@ -63,14 +66,10 @@ def dijkstraSolution(V, L, start):
                 q.put((-1 * mn, u))
     return cheapest[1]
 
-graph = "graphs/lab1/" + input("Graph name: ")
-if isfile(graph):
-    V, L = loadWeightedGraph(graph)
-    exp = int(readSolution(graph))
-    fu = findUnionSolution(V, L)
-    dj = dijkstraSolution(V, L, 0)
-    print(f"Expected solution: {exp}")
-    print(f"Find union solution: {fu} ({'ok' if fu == exp else 'wrong'})")
-    print(f"Dijkstra solution: {dj} ({'ok' if dj == exp else 'wrong'})")
-else:
-    print("Graph not found")
+if __name__ == "__main__":
+    fuTester = Tester("graphs/lab1/", loadWeightedGraph, findUnionSolution)
+    djTester = Tester("graphs/lab1/", loadWeightedGraph, dijkstraSolution)
+    print("FindUnion tester:")
+    fuTester.continousTesting()
+    print("Dijkstra tester:")
+    djTester.continousTesting()
