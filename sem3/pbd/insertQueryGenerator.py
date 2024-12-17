@@ -207,7 +207,7 @@ def get_times_range_possible_values():
         step = input("Input CORRECT step (hh:mm:ss): ")
     range_start, range_end = min_max(time_to_int(range_start), time_to_int(range_end))
     times = []
-    for t in range(range_start, range_end, time_to_int(step)):
+    for t in range(range_start, range_end+1, time_to_int(step)):
         time.append(int_to_time(t))
     return times
 
@@ -262,7 +262,7 @@ def get_money_range_possible_values():
         step = input("Input CORRECT step (.2f): ")
     range_start, range_end = min_max(money_to_int(range_start), money_to_int(range_end))
     moneys = []
-    for m in range(range_start, range_end, money_to_int(step)):
+    for m in range(range_start, range_end+1, money_to_int(step)):
         moneys.append(int_to_money(m))
     return moneys
 
@@ -349,24 +349,24 @@ def get_column_info(column_number):
     return Column(column_name, possible_values, unique, value_type.get_value_function, value_function_args)
 
 if __name__ == "__main__":
-    # file_output_path = input("File output name: ")
-    # max_num_of_queries = int(input("Max number of queries to generate: "))
-    # table_name = input("Table name: ")
-    # num_of_columns = int(input("Number of columns: "))
-    # columns = []
-    # for i in range(num_of_columns):
-    #     columns.append(get_column_info(i))
-    # queries = generate_insert_queries(max_num_of_queries, table_name, columns)
-    # save_queries(file_output_path, queries)
-    addresses = load_possible_values_from_file()
-    for i in range(len(addresses)):
-        a = addresses[i].split(", ")
-        addresses[i] = (a[0][1:], a[3], a[2], a[-1][:-1])
-    c = Column(None, addresses, True, None, None)
-    file = open("addresses.sql", "w")
-    for i in range(6202, 7502):
-        ad = get_random_value(c, None)
-        q = f"INSERT INTO addresses (studentID, street, city, zipCode, country) VALUES ({i},'{ad[0]}','{ad[1]}','{ad[2]}','{ad[3]}')\n"
-        file.write(q)
-    file.close()
+    file_output_path = input("File output name: ")
+    max_num_of_queries = int(input("Max number of queries to generate: "))
+    table_name = input("Table name: ")
+    num_of_columns = int(input("Number of columns: "))
+    columns = []
+    for i in range(num_of_columns):
+        columns.append(get_column_info(i))
+    queries = generate_insert_queries(max_num_of_queries, table_name, columns)
+    save_queries(file_output_path, queries)
+    # addresses = load_possible_values_from_file()
+    # for i in range(len(addresses)):
+    #     a = addresses[i].split(", ")
+    #     addresses[i] = (a[0][1:], a[3], a[2], a[-1][:-1])
+    # c = Column(None, addresses, True, None, None)
+    # file = open("addresses.sql", "w")
+    # for i in range(6202, 7502):
+    #     ad = get_random_value(c, None)
+    #     q = f"INSERT INTO addresses (studentID, street, city, zipCode, country) VALUES ({i},'{ad[0]}','{ad[1]}','{ad[2]}','{ad[3]}')\n"
+    #     file.write(q)
+    # file.close()
 
