@@ -20,6 +20,11 @@ def get_random_value(column, other_values):
         return column.possible_values.pop(index)
     return column.possible_values[index]
 
+def get_next_value(column, other_values):
+    if len(column.possible_values) == 0:
+        return None
+    return column.possible_values.pop(0)
+
 def get_mail(column, other_values):
     name_index, surname_index, domain = column.value_function_args
     name = other_values[name_index]
@@ -40,16 +45,16 @@ class ValueType:
         self.get_value_function = get_value_function
         self.get_value_function_args = get_value_function_args
 
-def load_possible_values_from_file():
-    path = input("Input file path: ")
+def load_possible_values_from_file(file_command_log_path, saved_commands):
+    path = read_or_input("Input file path: ", file_command_log_path, saved_commands)
     while not isfile(path):
-        path = input("Input CORRECT file path: ")
+        path = read_or_input("Input CORRECT file path: ", file_command_log_path, saved_commands)
     file = open(path, "r")
     values = []
     for line in file:
         if line[-1] == "\n":
             line = line[:-1]
-        values.append(f"'{line}'")
+        values.append(f"N'{line}'")
     return values
 
 def is_int(string):
@@ -65,15 +70,22 @@ def min_max(val1, val2):
         return val1, val2
     return val2, val1
 
-def get_integers_range_possible_values():
-    range_start = input("Input start of range: ")
+def get_integers_range_possible_values(file_command_log_path, saved_commands):
+    range_start = read_or_input("Input start of range: ", file_command_log_path, saved_commands)
     while not is_int(range_start):
-        range_start = input("Input CORRECT start of range: ")
-    range_end = input("Input end of range: ")
+        range_start = read_or_input("Input CORRECT start of range: ", file_command_log_path, saved_commands)
+    range_end = read_or_input("Input end of range: ", file_command_log_path, saved_commands)
     while not is_int(range_end):
-        range_end = input("Input CORRECT end of range: ")
+        range_end = read_or_input("Input CORRECT end of range: ", file_command_log_path, saved_commands)
     range_start, range_end = min_max(int(range_start), int(range_end))
     return [i for i in range(range_start, range_end+1)]
+
+def get_random_64_string(length):
+    characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-_"
+    string = ""
+    for _ in range(length):
+        string += characters[int(random() * 64)]
+    return string
 
 def is_leap(year):
     return year % 4 == 0 and (year % 100 != 0 or year % 400 == 0)
@@ -85,7 +97,7 @@ def get_max_days(year):
     return max_days
 
 def get_max_day(year, month):
-    return get_max_days(year)[month]
+    return get_max_days(year)[month-1]
 
 def is_correct_date(year, month, day):
     if year < 1800:
@@ -135,13 +147,13 @@ def ymd_to_string(year, month, day):
         day = f"0{day}"
     return f"{year}-{month}-{day}"
 
-def get_dates_range_possible_values():
-    range_start = input("Input start of range (yyyy-mm-dd): ")
+def get_dates_range_possible_values(file_command_log_path, saved_commands):
+    range_start = read_or_input("Input start of range (yyyy-mm-dd): ", file_command_log_path, saved_commands)
     while not is_date(range_start):
-        range_start = input("Input CORRECT start of range (yyyy-mm-dd): ")
-    range_end = input("Input end of range (yyyy-mm-dd): ")
+        range_start = read_or_input("Input CORRECT start of range (yyyy-mm-dd): ", file_command_log_path, saved_commands)
+    range_end = read_or_input("Input end of range (yyyy-mm-dd): ", file_command_log_path, saved_commands)
     while not is_date(range_end):
-        range_end = input("Input CORRECT end of range (yyyy-mm-dd): ")
+        range_end = read_or_input("Input CORRECT end of range (yyyy-mm-dd): ", file_command_log_path, saved_commands)
     range_start, range_end = min_max_date(range_start, range_end)
     dates = [f"'{range_start}'"]
     y, m, d = split_string_to_date(range_start)
@@ -195,33 +207,46 @@ def int_to_time(int_time):
         sc = "0" + str(sc)
     return f"'{hr}:{mn}:{sc}'"
 
-def get_times_range_possible_values():
-    range_start = input("Input start of range (hh:mm:ss): ")
+def get_times_range_possible_values(file_command_log_path, saved_commands):
+    range_start = read_or_input("Input start of range (hh:mm:ss): ", file_command_log_path, saved_commands)
     while not is_time(range_start):
-        range_start = input("Input CORRECT start of range (hh:mm:ss): ")
-    range_end = input("Input end of range (hh:mm:ss): ")
+        range_start = read_or_input("Input CORRECT start of range (hh:mm:ss): ", file_command_log_path, saved_commands)
+    range_end = read_or_input("Input end of range (hh:mm:ss): ", file_command_log_path, saved_commands)
     while not is_time(range_end):
-        range_end = input("Input CORRECT end of range (hh:mm:ss): ")
-    step = input("Input step (hh:mm:ss): ")
+        range_end = read_or_input("Input CORRECT end of range (hh:mm:ss): ", file_command_log_path, saved_commands)
+    step = read_or_input("Input step (hh:mm:ss): ", file_command_log_path, saved_commands)
     while not is_time(step):
-        step = input("Input CORRECT step (hh:mm:ss): ")
+        step = read_or_input("Input CORRECT step (hh:mm:ss): ", file_command_log_path, saved_commands)
     range_start, range_end = min_max(time_to_int(range_start), time_to_int(range_end))
     times = []
     for t in range(range_start, range_end+1, time_to_int(step)):
-        time.append(int_to_time(t))
+        times.append(int_to_time(t))
     return times
 
 def date_and_time_to_datetime(date, time):
     return f"{date[:-1]}T{time[1:]}"
 
-def get_datetime_possible_values():
-    dates = get_dates_range_possible_values()
-    times = get_times_range_possible_values()
+def get_datetime_possible_values(file_command_log_path, saved_commands):
+    dates = get_dates_range_possible_values(file_command_log_path, saved_commands)
+    times = get_times_range_possible_values(file_command_log_path, saved_commands)
     datetimes = []
     for d in dates:
         for t in times:
             datetimes.append(date_and_time_to_datetime(d, t))
     return datetimes
+
+def get_datetime_after_random_duration(column, other_values):
+    base_dt = other_values[column.value_function_args]
+    base_dt_array = base_dt.split('T')
+    duration = get_random_value(column, other_values)
+    new_time = int_to_time(time_to_int(base_dt_array[1][:-1]) + time_to_int(duration[1:-1]))
+    return date_and_time_to_datetime(base_dt_array[0] + "'", new_time)
+
+def get_duration_function_args(file_command_log_path, saved_commands):
+    dt_index = read_or_input("Input column number of datetime: ", file_command_log_path, saved_commands)
+    while not is_int(dt_index):
+        dt_index = read_or_input("Input CORRECT column number of datetime: ", file_command_log_path, saved_commands)
+    return int(dt_index)-1
 
 def split_string_to_money(string):
     arr = string.split(".")
@@ -250,43 +275,43 @@ def money_to_int(string):
 def int_to_money(int_money):
     return f"{int_money // 100}.{int_money % 100}"
 
-def get_money_range_possible_values():
-    range_start = input("Input start of range (.2f): ")
+def get_money_range_possible_values(file_command_log_path, saved_commands):
+    range_start = read_or_input("Input start of range (.2f): ", file_command_log_path, saved_commands)
     while not is_money(range_start):
-        range_start = input("Input CORRECT start of range (.2f): ")
-    range_end = input("Input end of range (.2f): ")
+        range_start = read_or_input("Input CORRECT start of range (.2f): ", file_command_log_path, saved_commands)
+    range_end = read_or_input("Input end of range (.2f): ", file_command_log_path, saved_commands)
     while not is_money(range_end):
-        range_end = input("Input CORRECT end of range (.2f): ")
-    step = input("Input step (.2f): ")
+        range_end = read_or_input("Input CORRECT end of range (.2f): ", file_command_log_path, saved_commands)
+    step = read_or_input("Input step (.2f): ", file_command_log_path, saved_commands)
     while not is_money(step):
-        step = input("Input CORRECT step (.2f): ")
+        step = read_or_input("Input CORRECT step (.2f): ", file_command_log_path, saved_commands)
     range_start, range_end = min_max(money_to_int(range_start), money_to_int(range_end))
     moneys = []
     for m in range(range_start, range_end+1, money_to_int(step)):
         moneys.append(int_to_money(m))
     return moneys
 
-def get_empty_set():
+def get_empty_set(file_command_log_path, saved_commands):
     return set()
 
-def get_mail_function_args():
-    name_index = input("Input column number of name: ")
+def get_mail_function_args(file_command_log_path, saved_commands):
+    name_index = read_or_input("Input column number of name: ", file_command_log_path, saved_commands)
     while not is_int(name_index):
-        name_index = input("Input CORRECT column number of name: ")
-    surname_index = input("Input column number of surname: ")
+        name_index = read_or_input("Input CORRECT column number of name: ", file_command_log_path, saved_commands)
+    surname_index = read_or_input("Input column number of surname: ", file_command_log_path, saved_commands)
     while not is_int(surname_index):
-        surname_index = input("Input CORRECT column number of surname: ")
-    domain = input("Input domain: ")
+        surname_index = read_or_input("Input CORRECT column number of surname: ", file_command_log_path, saved_commands)
+    domain = read_or_input("Input domain: ", file_command_log_path, saved_commands)
     return int(name_index)-1, int(surname_index)-1, domain
 
-def get_bits():
-    percentage = input("Enter probability for 1")
+def get_bits(file_command_log_path, saved_commands):
+    percentage = read_or_input("Enter probability for 1 (in %): ", file_command_log_path, saved_commands)
     while not is_int(percentage) or int(percentage) < 0 or int(percentage) > 100:
-        percentage = input("Enter CORRECT probability for 1")
+        percentage = read_or_input("Enter CORRECT probability for 1 (in %): ", file_command_log_path, saved_commands)
     ones = int(percentage)
     return [1 for _ in range(ones)] + [0 for _ in range(100-ones)]
 
-def get_null():
+def get_null(file_command_log_path, saved_commands):
     return ["NULL"]
 
 def generate_insert_queries(max_num_of_queries, table_name, columns):
@@ -318,55 +343,91 @@ def save_queries(path, queries):
 
 POSSIBLE_VALUE_TYPES = {
     "i": ValueType("random int from range of ints (inclusive)", get_integers_range_possible_values, get_random_value, None, True),
+    "i2": ValueType("int from range of ints (inclusive) in order", get_integers_range_possible_values, get_next_value, None, False),
     "f": ValueType("random values from file", load_possible_values_from_file, get_random_value, None, True),
+    "f2": ValueType("values from file in given order", load_possible_values_from_file, get_next_value, None, False),
     "d": ValueType("random date from a range of dates (inclusive)", get_dates_range_possible_values, get_random_value, None, True),
     "t": ValueType("random time from a range and given step", get_times_range_possible_values, get_random_value, None, True),
     "dt": ValueType("datetime (combines d and t)", get_datetime_possible_values, get_random_value, None, True),
+    "dt2": ValueType("datetime from other datetime and duration from range", get_times_range_possible_values, get_datetime_after_random_duration, get_duration_function_args, False),
     "m": ValueType("random money from range of given step", get_money_range_possible_values, get_random_value, None, True),
     "ml": ValueType("get mail from name and surname (must be after name and surname)", get_empty_set, get_mail, get_mail_function_args, False),
     "b": ValueType("random bit (boolean) value", get_bits, get_random_value, None, False),
     "n": ValueType("fills column with nulls", get_null, get_random_value, None, False)
 }
 
-def get_column_info(column_number):
+def read_or_input(input_message, file_command_log_path, saved_commands):
+    if len(saved_commands) > 0:
+        return saved_commands.pop(0)
+    f = open(file_command_log_path, "a")
+    inp = input(input_message)
+    f.write(inp+"\n")
+    return inp
+
+def get_column_info(column_number, file_command_log_path, saved_commands):
     print(f"Column {column_number+1}:")
-    column_name = input("Column name: ")
+    column_name = read_or_input("Column name: ", file_command_log_path, saved_commands)
     for command, pvt in POSSIBLE_VALUE_TYPES.items():
         print(f"{command} - {pvt.description}")
-    value_type_command = input("Choose value type for column: ")
+    value_type_command = read_or_input("Choose value type for column: ", file_command_log_path, saved_commands)
     while value_type_command not in POSSIBLE_VALUE_TYPES.keys():
-        value_type_command = input("Choose CORRECT value type for column: ")
+        value_type_command = read_or_input("Choose CORRECT value type for column: ", file_command_log_path, saved_commands)
     value_type = POSSIBLE_VALUE_TYPES[value_type_command]
     unique = False
     if value_type.can_be_unique:
-        unique_command = input("Unique values? (N/y): ")
+        unique_command = read_or_input("Unique values? (N/y): ", file_command_log_path, saved_commands)
         if unique_command.lower() in ["yes", "y"]:
             unique = True
-    possible_values = value_type.possible_values_generator()
+    possible_values = value_type.possible_values_generator(file_command_log_path, saved_commands)
     value_function_args = None
     if value_type.get_value_function_args:
-        value_function_args = value_type.get_value_function_args()
+        value_function_args = value_type.get_value_function_args(file_command_log_path, saved_commands)
     return Column(column_name, possible_values, unique, value_type.get_value_function, value_function_args)
 
-if __name__ == "__main__":
+def query_generator():
     file_output_path = input("File output name: ")
-    max_num_of_queries = int(input("Max number of queries to generate: "))
-    table_name = input("Table name: ")
-    num_of_columns = int(input("Number of columns: "))
+    file_command_log_path = file_output_path + ".log"
+    saved_commands = []
+    if isfile(file_command_log_path):
+        f = open(file_command_log_path, "r")
+        for line in f:
+            if line[-1] == "\n":
+                line = line[:-1]
+            saved_commands.append(line)
+        f.close()
+    max_num_of_queries = int(read_or_input("Max number of queries to generate: ", file_command_log_path, saved_commands))
+    table_name = read_or_input("Table name: ", file_command_log_path, saved_commands)
+    num_of_columns = int(read_or_input("Number of columns: ", file_command_log_path, saved_commands))
     columns = []
     for i in range(num_of_columns):
-        columns.append(get_column_info(i))
+        columns.append(get_column_info(i, file_command_log_path, saved_commands))
     queries = generate_insert_queries(max_num_of_queries, table_name, columns)
     save_queries(file_output_path, queries)
-    # addresses = load_possible_values_from_file()
-    # for i in range(len(addresses)):
-    #     a = addresses[i].split(", ")
-    #     addresses[i] = (a[0][1:], a[3], a[2], a[-1][:-1])
-    # c = Column(None, addresses, True, None, None)
-    # file = open("addresses.sql", "w")
-    # for i in range(6202, 7502):
-    #     ad = get_random_value(c, None)
-    #     q = f"INSERT INTO addresses (studentID, street, city, zipCode, country) VALUES ({i},'{ad[0]}','{ad[1]}','{ad[2]}','{ad[3]}')\n"
-    #     file.write(q)
-    # file.close()
+
+def address_generator():
+    addresses = load_possible_values_from_file()
+    for i in range(len(addresses)):
+        a = addresses[i].split(", ")
+        addresses[i] = (a[0][1:], a[3], a[2], a[-1][:-1])
+    c = Column(None, addresses, True, None, None)
+    file = open("addresses.sql", "w")
+    for i in range(6202, 7502):
+        ad = get_random_value(c, None)
+        q = f"INSERT INTO addresses (studentID, street, city, zipCode, country) VALUES ({i},'{ad[0]}','{ad[1]}','{ad[2]}','{ad[3]}')\n"
+        file.write(q)
+    file.close()
+
+if __name__ == "__main__":
+    query_generator()
+    # f = open("modules-old_webinars.sql", "r")
+    # f2 = open("webinars-old.sql", "w")
+    # c = 0
+    # price = get_column_info(0)
+    # has_price = get_column_info(1)
+    # for line in f:
+    #     c += 1
+    #     n = line.split("'")[1]
+    #     p1, p2 = price.get_value(None), has_price.get_value(None)
+    #     p = float(p1) * p2
+    #     f2.write(f"INSERT INTO webinars (webinarID, moduleID, name, price) VALUES ({c}, {c}, '{n}', {p})\n")
 
