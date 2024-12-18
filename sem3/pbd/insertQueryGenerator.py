@@ -20,6 +20,11 @@ def get_random_value(column, other_values):
         return column.possible_values.pop(index)
     return column.possible_values[index]
 
+def get_value_gamble(column, other_values, base_function, default, probability):
+    if random() * 100 < probability:
+        return default
+    return base_function(column, other_values)
+
 def get_next_value(column, other_values):
     if len(column.possible_values) == 0:
         return None
@@ -353,7 +358,8 @@ POSSIBLE_VALUE_TYPES = {
     "m": ValueType("random money from range of given step", get_money_range_possible_values, get_random_value, None, True),
     "ml": ValueType("get mail from name and surname (must be after name and surname)", get_empty_set, get_mail, get_mail_function_args, False),
     "b": ValueType("random bit (boolean) value", get_bits, get_random_value, None, False),
-    "n": ValueType("fills column with nulls", get_null, get_random_value, None, False)
+    "n": ValueType("fills column with nulls", get_null, get_random_value, None, False),
+    "<other-command> g": ValueType("other value with chance at chosen default value", None, None, None, False)
 }
 
 def read_or_input(input_message, file_command_log_path, saved_commands):
@@ -370,9 +376,18 @@ def get_column_info(column_number, file_command_log_path, saved_commands):
     for command, pvt in POSSIBLE_VALUE_TYPES.items():
         print(f"{command} - {pvt.description}")
     value_type_command = read_or_input("Choose value type for column: ", file_command_log_path, saved_commands)
-    while value_type_command not in POSSIBLE_VALUE_TYPES.keys():
+    vtc_array = value_type_command.split(" ")
+    while vtc_array[0] not in POSSIBLE_VALUE_TYPES.keys():
         value_type_command = read_or_input("Choose CORRECT value type for column: ", file_command_log_path, saved_commands)
-    value_type = POSSIBLE_VALUE_TYPES[value_type_command]
+        vtc_array = value_type_command.split(" ")
+    value_type = POSSIBLE_VALUE_TYPES[vtc_array[0]]
+    if len(vtc_array) > 1 and vtc_array[1] == "g":
+        default_value = read_or_input("Enter default value: ", file_command_log_path, saved_commands)
+        probability = read_or_input("Enter probability (in %) for default value: ", file_command_log_path, saved_commands)
+        while not is_int(probability) or int(probability) < 0 or int(probability) > 100:
+            probability = read_or_input("Enter CORRECT probability (in %) for default value: ", file_command_log_path, saved_commands)
+        base_function = value_type.get_value_function
+        value_type.get_value_function = lambda col, vals: get_value_gamble(col, vals, base_function, default_value, int(probability))
     unique = False
     if value_type.can_be_unique:
         unique_command = read_or_input("Unique values? (N/y): ", file_command_log_path, saved_commands)
