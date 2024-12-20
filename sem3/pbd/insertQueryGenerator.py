@@ -12,7 +12,7 @@ class Column:
     def get_value(self, other_values):
         return self.get_value_function(self, other_values)
 
-def get_random_value(column, other_values):
+def get_random_value(column, _):
     if len(column.possible_values) == 0:
         return None
     index = int(random() * len(column.possible_values))
@@ -25,7 +25,7 @@ def get_value_gamble(column, other_values, base_function, default, probability):
         return default
     return base_function(column, other_values)
 
-def get_next_value(column, other_values):
+def get_next_value(column, _):
     if len(column.possible_values) == 0:
         return None
     return column.possible_values.pop(0)
@@ -316,7 +316,7 @@ def get_bits(file_command_log_path, saved_commands):
     ones = int(percentage)
     return [1 for _ in range(ones)] + [0 for _ in range(100-ones)]
 
-def get_null(file_command_log_path, saved_commands):
+def get_null(_, __):
     return ["NULL"]
 
 def generate_insert_queries(max_num_of_queries, table_name, columns):
