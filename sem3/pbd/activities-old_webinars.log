@@ -1,6 +1,10 @@
 50
 activities
-10
+8
+activityID
+i2
+51
+100
 moduleID
 i2
 1
@@ -8,8 +12,8 @@ i2
 lecturerID
 i
 
-6052
-6181
+51
+180
 languageID
 i
 
@@ -20,30 +24,22 @@ i g
 NULL
 90
 
-6182
-6201
+181
+200
 name
 f2
 webinars1
-studentPrice
-n
-regularPrice
-n
 timeStart
 dt
 
-2024-08-01
-2024-12-15
+2024-11-01
+2024-12-31
 8:0:0
-18:30:0
+20:0:0
 1:45:0
 timeEnd
 dt2
 1:30:0
 1:30:0
-1:1:1
-8
-activityID
-i2
-51
-100
+0:0:1
+7

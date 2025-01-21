@@ -346,6 +346,14 @@ def save_queries(path, queries):
         file.write(query + "\n")
     file.close()
 
+def get_base_link(file_command_log_path, saved_commands):
+    base_link = read_or_input("Input base link: ", file_command_log_path, saved_commands)
+    id_length = read_or_input("Input id length: ", file_command_log_path, saved_commands)
+    return [base_link, int(id_length)]
+
+def get_link_with_id(column, _):
+    return f"'{column.possible_values[0]}{get_random_64_string(column.possible_values[1])}'"
+
 POSSIBLE_VALUE_TYPES = {
     "i": ValueType("random int from range of ints (inclusive)", get_integers_range_possible_values, get_random_value, None, True),
     "i2": ValueType("int from range of ints (inclusive) in order", get_integers_range_possible_values, get_next_value, None, False),
@@ -357,6 +365,7 @@ POSSIBLE_VALUE_TYPES = {
     "dt2": ValueType("datetime from other datetime and duration from range", get_times_range_possible_values, get_datetime_after_random_duration, get_duration_function_args, False),
     "m": ValueType("random money from range of given step", get_money_range_possible_values, get_random_value, None, True),
     "ml": ValueType("get mail from name and surname (must be after name and surname)", get_empty_set, get_mail, get_mail_function_args, False),
+    "l": ValueType("get link with random base64 id at the end", get_base_link, get_link_with_id, None, False),
     "b": ValueType("random bit (boolean) value", get_bits, get_random_value, None, False),
     "n": ValueType("fills column with nulls", get_null, get_random_value, None, False),
     "<other-command> g": ValueType("other value with chance at chosen default value", None, None, None, False)
@@ -401,7 +410,10 @@ def get_column_info(column_number, file_command_log_path, saved_commands):
 
 def query_generator():
     file_output_path = input("File output name: ")
-    file_command_log_path = file_output_path + ".log"
+    file_command_log_path = file_output_path
+    if len(file_command_log_path) >= 4 and file_command_log_path[-4:] == ".sql":
+        file_command_log_path = file_command_log_path[:-4]
+    file_command_log_path = file_command_log_path + ".log"
     saved_commands = []
     if isfile(file_command_log_path):
         f = open(file_command_log_path, "r")
@@ -420,20 +432,21 @@ def query_generator():
     save_queries(file_output_path, queries)
 
 def address_generator():
-    addresses = load_possible_values_from_file()
+    addresses = load_possible_values_from_file("s", [])
     for i in range(len(addresses)):
         a = addresses[i].split(", ")
         addresses[i] = (a[0][1:], a[3], a[2], a[-1][:-1])
     c = Column(None, addresses, True, None, None)
     file = open("addresses.sql", "w")
-    for i in range(6202, 7502):
+    for i in range(201, 1501):
         ad = get_random_value(c, None)
-        q = f"INSERT INTO addresses (studentID, street, city, zipCode, country) VALUES ({i},'{ad[0]}','{ad[1]}','{ad[2]}','{ad[3]}')\n"
+        q = f"INSERT INTO addresses (studentID, street, city, zipCode, country) VALUES ({i},N'{ad[0][1:]}',N'{ad[1]}',N'{ad[2]}',N'{ad[3]}')\n"
         file.write(q)
     file.close()
 
 if __name__ == "__main__":
     query_generator()
+    # address_generator()
     # f = open("modules-old_webinars.sql", "r")
     # f2 = open("webinars-old.sql", "w")
     # c = 0
