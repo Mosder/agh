@@ -7,3 +7,6 @@ __pycache__
 obiektowe-lab/
 sem2/
 sem3/
+.vscode/
+target/
+debug/
