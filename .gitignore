@@ -3,14 +3,7 @@
 .RData
 .Ruserdata
 __pycache__
-sem3/ageo/README.md
-sem3/ageo/alg-geo.txt
-sem3/ageo/bitalg.egg-info/
-sem3/ageo/dist/
-sem3/ageo/requirements.txt
-sem3/ageo/setup.py
-sem3/ageo/bitalg/tests/
-sem3/ageo/bitalg/visualizer/
-sem3/PO_2024_PN1830_BOROWIEC
 .ipynb_checkpoints
 obiektowe-lab/
+sem2/
+sem3/
