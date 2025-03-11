@@ -1,4 +1,0 @@
-By generowanie myszką własnego wielokąta działało poprawnie należało zainstalować ipympl.
-Użyto do tego komendy: conda install -c conda-forge ipympl
-Do algorytmów użyto kolekcji SortedSet z biblioteki sortedcontainers.
-Zainstallowano ją przy użyciu komendy: pip install sortedcontainers
