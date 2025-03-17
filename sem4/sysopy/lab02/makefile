@@ -1,6 +1,8 @@
 CC=gcc
 CFLAGS=-Wall -std=c17
 
+all: static shared dll
+
 lib-static: collatz.c
 	$(CC) $(CFLAGS) -c collatz.c
 	ar rcs libcollatz.a collatz.o
