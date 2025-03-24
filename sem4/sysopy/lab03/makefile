@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-Wall -std=c17
+CFLAGS=-Wall
 
 all: flipper
 
@@ -9,3 +9,4 @@ flipper: flipper.c
 .PHONY: clean
 clean:
 	rm flipper
+	ls -d */ | grep -v ^art/$ | xargs rm -rf
