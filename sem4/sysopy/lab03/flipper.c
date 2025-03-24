@@ -37,6 +37,10 @@ int main(int argc, char *argv[]) {
         printf("Nieprawidłowa liczba argumentów\n");
         return 0;
     }
+    if (strcmp(argv[1], argv[2]) == 0) {
+        printf("Wyjściowy katalog nie może być taki sam jak wejściowy\n");
+        return 0;
+    }
     DIR *input_dir = opendir(argv[1]);
     if (input_dir == NULL) {
         printf("Katalog %s nie istnieje\n", argv[1]);
