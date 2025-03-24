@@ -5,16 +5,6 @@
 #define PATH_LIMIT 100
 #define LINE_LIMIT 1000
 
-DIR* read_path_and_open_dir(char *message, char *dir_path) {
-    DIR *dir = NULL;
-    while (!dir) {
-        printf("%s\n", message);
-        scanf("%s", dir_path);
-        dir = opendir(dir_path);
-    }
-    return dir;
-}
-
 int is_txt_file(struct dirent *file) {
     return strlen(file->d_name) >= 4 && strcmp(&file->d_name[strlen(file->d_name) - 4], ".txt") == 0;
 }
@@ -42,21 +32,25 @@ void reverse_file_lines(char *input_path, char *output_path) {
     fclose(output_file);
 }
 
-int main(void) {
-    char input_path[PATH_LIMIT], output_path[PATH_LIMIT];
-    DIR *input_dir = read_path_and_open_dir("Podaj ścieżkę do katalogu wejściowego:", input_path);
-
-    printf("Podaj ścieżkę do katalogu wyjściowego:\n");
-    scanf("%s", output_path);
-    mkdir(output_path, S_IRWXU | S_IRGRP | S_IROTH);
-    DIR *output_dir = opendir(output_path);
+int main(int argc, char *argv[]) {
+    if (argc != 3) {
+        printf("Nieprawidłowa liczba argumentów\n");
+        return 0;
+    }
+    DIR *input_dir = opendir(argv[1]);
+    if (input_dir == NULL) {
+        printf("Katalog %s nie istnieje\n", argv[1]);
+        return 0;
+    }
+    mkdir(argv[2], S_IRWXU | S_IRGRP | S_IROTH);
+    DIR *output_dir = opendir(argv[2]);
 
     for (struct dirent *file = readdir(input_dir); file != NULL; file = readdir(input_dir)) {
         if (!is_txt_file(file)) continue;
 
         char input_file_path[PATH_LIMIT], output_file_path[PATH_LIMIT];
-        create_full_file_path(input_file_path, input_path, file->d_name);
-        create_full_file_path(output_file_path, output_path, file->d_name);
+        create_full_file_path(input_file_path, argv[1], file->d_name);
+        create_full_file_path(output_file_path, argv[2], file->d_name);
 
         reverse_file_lines(input_file_path, output_file_path);
     }
