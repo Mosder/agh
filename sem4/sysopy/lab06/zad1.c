@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
     
     double dx = strtod(argv[1], NULL);
     int n = atoi(argv[2]);
-    if (dx < 0 || n < 1) {
+    if (dx <= 0 || n < 1) {
         printf("Niepoprawne wartości argumentów\n");
         return 1;
     }
