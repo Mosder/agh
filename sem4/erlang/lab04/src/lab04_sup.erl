@@ -27,14 +27,18 @@ start_link() ->
 %%                  modules => modules()}   % optional
 init([]) ->
     SupFlags = #{
-        strategy => one_for_all,
+        strategy => one_for_one,
         intensity => 2,
         period => 2
     },
     ChildSpecs = [
         #{
-            id = pollution,
-            start => {poll, start_link, []}
+            id => pollution,
+            start => {pollution_gen_server, start_link, []}
+        },
+        #{
+            id => pollution_adder,
+            start => {pollution_value_collector_gen_statem, start_link, []}
         }
     ],
     {ok, {SupFlags, ChildSpecs}}.

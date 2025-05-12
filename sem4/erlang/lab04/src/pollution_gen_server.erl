@@ -10,10 +10,20 @@
 
 -export([start_link/0]).
 -export([init/1, handle_call/3, handle_cast/2, terminate/2]).
+-export([
+    crash/0,
+    stop/0,
+    add_station/2,
+    add_value/4,
+    remove_value/3,
+    get_one_value/3,
+    get_station_min/2,
+    get_station_mean/2,
+    get_daily_mean/2,
+    get_daily_average_data_count/1
+]).
 
 -define(SERVER, ?MODULE). 
-
--record(pollution_gen_server_state, {}).
 
 %%%===================================================================
 %%% Spawning and gen_server implementation
@@ -23,50 +33,56 @@ start_link() ->
     gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
 
 init([]) ->
-    {ok, #pollution_gen_server_state{}}.
+    {ok, pollution:create_monitor()}.
 
-handle_call(_Request, _From, State = #pollution_gen_server_state{}) ->
-    {reply, ok, State}.
+handle_call({Function, Args}, _From, State) ->
+    {reply, erlang:apply(pollution, Function, Args++[State]), State}.
 
-handle_cast(_Request, State = #pollution_gen_server_state{}) ->
-    {noreply, State}.
+handle_cast(crash, _State) ->
+    crash:crash();
+handle_cast(stop, State) ->
+    {stop, normal, State};
+handle_cast({Function, Args}, State) ->
+    Output = erlang:apply(pollution, Function, Args++[State]),
+    case Output of
+        {error, Message} ->
+            io:format("~s~n", [Message]),
+            {noreply, State};
+        Result -> {noreply, Result}
+    end.
 
-terminate(_Reason, _State = #pollution_gen_server_state{}) ->
-    ok.
+terminate(Reason, _State) ->
+    io:format("Server closed with reason: ~s~n", [Reason]),
+    Reason.
 
 %%%===================================================================
 %%% Internal functions
 %%%===================================================================
--record(call, {type, args}).
+crash() -> gen_server:cast(pollution_gen_server, crash).
 
-stop() -> pollutionServer ! {request, stop}, ok.
-
-call(Call = #call{}) ->
-    pollutionServer ! {request, self(), Call},
-    receive
-        {reply, Reply} -> Reply
-    end.
+stop() ->
+    gen_server:cast(pollution_gen_server, stop).
 
 add_station(Name, {Lat, Lon}) ->
-    call(#call{type=setter, args={add_station, Name, {Lat, Lon}}}).
+    gen_server:cast(pollution_gen_server, {add_station, [Name, {Lat, Lon}]}).
 
 add_value(ID, DateTime, Type, Value) ->
-    call(#call{type=setter, args={add_value, ID, DateTime, Type, Value}}).
+    gen_server:cast(pollution_gen_server, {add_value, [ID, DateTime, Type, Value]}).
 
 remove_value(ID, DateTime, Type) ->
-    call(#call{type=setter, args={remove_value, ID, DateTime, Type}}).
+    gen_server:cast(pollution_gen_server, {remove_value, [ID, DateTime, Type]}).
 
 get_one_value(ID, DateTime, Type) ->
-    call(#call{type=getter, args={get_one_value, ID, DateTime, Type}}).
+    gen_server:call(pollution_gen_server, {get_one_value, [ID, DateTime, Type]}).
 
 get_station_min(ID, Type) ->
-    call(#call{type=getter, args={get_station_min, ID, Type}}).
+    gen_server:call(pollution_gen_server, {get_station_min, [ID, Type]}).
 
 get_station_mean(ID, Type) ->
-    call(#call{type=getter, args={get_station_mean, ID, Type}}).
+    gen_server:call(pollution_gen_server, {get_station_mean, [ID, Type]}).
 
 get_daily_mean(Type, Date) ->
-    call(#call{type=getter, args={get_daily_mean, Type, Date}}).
+    gen_server:call(pollution_gen_server, {get_daily_mean, [Type, Date]}).
 
 get_daily_average_data_count(Date) ->
-    call(#call{type=getter, args={get_daily_average_data_count, Date}}).
+    gen_server:call(pollution_gen_server, {get_daily_average_data_count, [Date]}).
