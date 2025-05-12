@@ -2,20 +2,30 @@
 #include <time.h>
 #include <stdlib.h>
 #include <string.h>
+#include <pthread.h>
 
-#define BUFFER_LIMIT 256
+typedef struct {
+    double range_start;
+    double range_end;
+    double dx;
+    double *sub_result_address;
+    int *ready_address;
+} integral_args;
 
 double f(double x) {
     return 4/(x*x + 1);
 }
 
 // calculate subrange of integral
-double calculate_sub_integral(double range_start, double range_end, double dx) {
+void* calculate_sub_integral(void *args) {
+    integral_args *data = (integral_args*) args;
     double sub_result = 0.0;
-    for (double x = range_start; x <= range_end; x += dx) {
-        sub_result += dx * f(x);
+    for (double x = data->range_start; x < data->range_end; x += data->dx) {
+        sub_result += data->dx * f(x);
     }
-    return sub_result;
+    *data->sub_result_address = sub_result;
+    *data->ready_address = 1;
+    return NULL;
 }
 
 // calculate whole integral
@@ -30,12 +40,19 @@ double calculate_integral(int thread_count, double dx, double *t) {
     memset(ready_array, 0, sizeof(ready_array));
 
     // define the size of sub ranges
-    double sub_range_size = 1 / thread_count;
+    double sub_range_size = 1.0 / thread_count;
     // create threads for calculations
+    pthread_t threads[thread_count];
+    integral_args args[thread_count];
     for (int t_num = 0; t_num < thread_count; t_num++) {
-        // pthread_t thread; - change to threads
-        sub_results[t_num] = calculate_sub_integral(t_num * sub_range_size, (t_num+1) * sub_range_size, dx);
-        ready_array[t_num] = 1;
+        // define args structure
+        args[t_num].range_start = t_num * sub_range_size;
+        args[t_num].range_end = args[t_num].range_start + sub_range_size;
+        args[t_num].dx = dx;
+        args[t_num].sub_result_address = sub_results + t_num;
+        args[t_num].ready_address = ready_array + t_num;
+        // run calculations in new thread
+        pthread_create(threads + t_num, NULL, calculate_sub_integral, (void*) (args+t_num));
     }
 
     // wait until all threads are ready
