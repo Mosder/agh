@@ -3,8 +3,8 @@ CFLAGS=-Wall
 
 all: zad
 
-zad: server.c printer.c client.c
-	$(CC) $(CFLAGS) printer.c -o preinter
+zad: printer.c client.c
+	$(CC) $(CFLAGS) printer.c -o printer
 	$(CC) $(CFLAGS) client.c -o client
 
 .PHONY: clean
