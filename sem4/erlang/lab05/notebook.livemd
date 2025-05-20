@@ -1,0 +1,116 @@
+<!-- livebook:{"autosave_interval_s":30} -->
+
+# Laboratorium 5
+
+## Section
+
+```elixir
+defmodule Parser do
+  def parse_lines([]) do
+    []
+  end
+  def parse_lines([""]) do
+    []
+  end
+  def parse_lines([h | t]) do
+    [String.split(h, ";")] ++ parse_lines(t)
+  end
+end
+
+line_arrays = File.read!("/home/mosder/agh/sem4/erlang/lab05/AirlyData-ALL-50k.csv")
+|> String.split("\n")
+|> Parser.parse_lines
+```
+
+```elixir
+defmodule Mapper do
+  def line_to_map(line) do
+    [datetime, type, value, id, name, coords] = line
+    %{
+      # parse datetime
+      :datetime => {
+        datetime
+        |> String.slice(0..9)
+        |> String.split("-")
+        |> Enum.map(&String.to_integer/1)
+        |> List.to_tuple,
+        datetime
+        |> String.slice(11..18)
+        |> String.split(":")
+        |> Enum.map(&String.to_integer/1)
+        |> List.to_tuple
+      },
+      # parse type
+      :type => type,
+      # parse value
+      :value => value |> String.to_float,
+      # parse id
+      :id => id |> String.to_integer,
+      # parse name
+      :name => name,
+      # parse coords
+      :coords => coords
+      |> String.split(",")
+      |> Enum.map(&String.to_float/1)
+      |> List.to_tuple
+    }
+  end
+end
+
+map_array = line_arrays
+|> Enum.map(&Mapper.line_to_map/1)
+```
+
+```elixir
+defmodule StationIdentifier do
+  def identify_stations(map_array) do
+    map_array
+    |> Enum.uniq_by(&(&1.id))
+    |> Enum.map(&(%{:name => "#{&1.id} #{&1.name}", :coords => &1.coords}))
+  end
+end
+
+stations = StationIdentifier.identify_stations(map_array)
+```
+
+```elixir
+Code.append_path("/home/mosder/agh/sem4/erlang/lab04/_build/default/lib/lab04/ebin")
+Application.start(:lab04)
+```
+
+```elixir
+defmodule StationLoader do
+  def load_stations(stations) do
+    stations
+    |> Enum.map(&(:pollution_gen_server.add_station(&1.name, &1.coords)))
+  end
+end
+
+:timer.tc(StationLoader, :load_stations, [stations]) |> elem(0)
+```
+
+```elixir
+defmodule DataLoader do
+  def load_data(data) do
+    data
+    |> Enum.map(&(:pollution_gen_server.add_value(&1.coords, &1.datetime, &1.type, &1.value)))
+  end
+end
+
+:timer.tc(DataLoader, :load_data, [map_array]) |> elem(0)
+```
+
+```elixir
+defmodule DataAnalyzer do
+  def analyze_get_station_min() do
+    :pollution_gen_server.get_station_min("9910 Polska, Kraków, Studencka", "PM10")
+  end
+  def analyze_get_daily_mean() do
+    :pollution_gen_server.get_daily_mean("PM25", {2024, 2, 10})
+  end
+end
+
+{time1, result1} = :timer.tc(DataAnalyzer, :analyze_get_station_min, [])
+{time2, result2} = :timer.tc(DataAnalyzer, :analyze_get_daily_mean, [])
+{time1, result1, time2, result2}
+```
