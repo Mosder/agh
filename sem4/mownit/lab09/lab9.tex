@@ -1,0 +1,173 @@
+\documentclass{article}
+\usepackage[polish]{babel}
+\usepackage[T1]{fontenc}
+\usepackage{amsmath}
+\usepackage{graphicx} % Required for inserting images
+
+\title{Laboratorium 9 \\ Równania różniczkowe zwyczajne - część I}
+\author{Maciej Borowiec}
+\date{20.05.2025}
+
+\begin{document}
+
+\maketitle
+
+\section{Wprowadzenie}
+Celem ćwiczenia było zrobienie sześciu zadań związanych z równaniami różniczkowymi zwyczajnymi. Zadania miały na celu przedstawienie sposobów rozwiązywania równań różniczkowych.
+
+\section{Zadania}
+
+\subsection{Zadanie 1.}
+Zadanie polegało na przekształcenie podanych równań różniczkowych na równoważny układ równań pierwszego rzędu.
+
+\subsubsection{Równanie Van der Pol'a}
+$$ y'' = y'(1- y^2) - y $$
+Podstawiamy $u_1 = y$, $u_2 = y'$, wtedy:
+\begin{equation}
+    \begin{cases}
+        u_1' = u_2 \\
+        u_2' = u_2(1-u_1^2)-u_1
+    \end{cases} \nonumber
+\end{equation}
+Otrzymany układ równań jest układem równań pierwszego rzędu.
+
+\subsubsection{Równanie Blasiusa}
+$$ y''' = -yy'' $$
+Podstawiamy $u_1 = y$, $u_2 = y'$, $u_3 = y''$, wtedy:
+\begin{equation}
+    \begin{cases}
+        u_1' = u_2 \\
+        u_2' = u_3 \\
+        u_3' = -u_1u_3
+    \end{cases} \nonumber
+\end{equation}
+Ponownie otrzymano układ równań pierwszego rzędu.
+
+\subsubsection{II zasada dynamiki Newtona dla problemu dwóch ciał}
+\begin{equation}
+    \begin{cases}
+        y_1'' = -GMy_1/(y_1^2+y_2^2)^{3/2} \\
+        y_2'' = -GMy_2/(y_1^2+y_2^2)^{3/2}
+    \end{cases} \nonumber
+\end{equation}
+Podstawiamy $u_1 = y_1$, $u_2 = y_2$, $u_3 = y_1'$, $u_4 = y_2'$, wtedy:
+\begin{equation}
+    \begin{cases}
+        u_1' = u_3 \\
+        u_2' = u_4 \\
+        u_3' = -GMu_1/(u_1^2+u_2^2)^{3/2} \\
+        u_4' = -GMu_2/(u_1^2+u_2^2)^{3/2}
+    \end{cases} \nonumber
+\end{equation}
+Otrzymany układ równań jest układem równań pierwszego rzędu.
+
+\subsection{Zadanie 2.}
+W tym zadaniu należało przekształcić poniższy problem początkowy do autonomicznego problemu początkowego.
+\begin{equation}
+    \begin{cases}
+        y_1' = \frac{y_1}{t} + y_2t \\
+        y_2' = \frac{t}{y_1}(y_2^2 - 1) \\
+    \end{cases} \nonumber
+    \begin{cases}
+        y_1(1) = 1 \\
+        y_2(1) = 0 \\
+    \end{cases} \nonumber
+\end{equation}
+\\
+Aby poprawnie przekształcić problem do problemu początkowego, należy dodać nową zmienną tożsamościowo równą $t$. W tym przypadku dodajemy zmienną $y_3(t) = t$. Wtedy otrzymujemy:
+\begin{equation}
+    \begin{cases}
+        y_1' = \frac{y_1}{y_3} + y_2y_3 \\
+        y_2' = \frac{y_3}{y_1}(y_2^2 - 1) \\
+        y_3' = 1
+    \end{cases} \nonumber
+    \begin{cases}
+        y_1(1) = 1 \\
+        y_2(1) = 0 \\
+        y_3(1) = 1
+    \end{cases} \nonumber
+\end{equation}
+W ten sposób otrzymaliśmy autonomiczny problem początkowy.
+
+\subsection{Zadanie 3.}
+Dla danego problemu początkowego:
+\begin{equation}
+    y' = \sqrt{1-y}
+\end{equation}
+$$ y(0) = 0 $$
+Należało pokazać, że funkcja $y(t) = \frac{t}{4}(4-t)$ spełnia równanie i warunek początkowy oraz wyznaczyć dziedzinę, dla której ta funkcja jest rozwiązaniem tego problemu.
+\\\\
+Sprawdzenie warunku początkowego:
+$$ y(0) = \frac{0}{4}(4-0) = 0$$
+Następnie wyznaczmy pochdną funkcji $y(t)$:
+$$ y'(t) = (\frac{t}{4}(4-t))' = (t - \frac{t^2}{4})' = 1 - \frac{t}{2} $$
+Podstawmy do problemu początkowego (1):
+$$ 1-\frac{t}{2} = \sqrt{1 - t + \frac{t^2}{4}} = \sqrt{(1-\frac{t}{2})^2}$$
+$$ 1-\frac{t}{2} = |1-\frac{t}{2}|$$
+Zatem dana funkcja jest rozwiązaniem tego problemu wtw., gdy $1-\frac{t}{2} \geq 0$.
+$$ 1-\frac{t}{2} \geq 0 $$
+$$ t \leq 2$$
+Zatem dziedziną tego rozwiązania jest $D = (-\infty;2]$.
+
+\subsection{Zadanie 4.}
+
+\subsection{Zadanie 5.}
+Dla danego układu równań różniczkowych zwyczajnych:
+\begin{equation}
+    \begin{cases}
+        y_1' = -2y_1 + y_2 \\
+        y_2' = -y_1 - 2y_2
+    \end{cases} \nonumber
+\end{equation}
+Należało wyznaczyć przedział wartości kroku $h$, dla którego metoda Euler'a jest stablina dla tegu układu równań.
+\\\\
+Układ równań można przedstawić w postaci macierzowej:
+$$ y' = Ay$$
+gdzie:
+\begin{equation}
+    y' =
+    \begin{bmatrix}
+        y_1' \\ y_2'
+    \end{bmatrix}
+    ,\quad
+    A =
+    \begin{bmatrix}
+        -2 & 1 \\
+        1 & -2
+    \end{bmatrix}
+    ,\quad
+    y =
+    \begin{bmatrix}
+        y_1 \\ y_2
+    \end{bmatrix}
+\nonumber
+\end{equation}
+Wtedy wiadomo, że metoda Eulera jest stabilna, gdy:
+$$ 0 < h < \frac{2}{\lambda_{max}} $$
+$$ \lambda_{max} = \max \{|\lambda|\ \ |\ \ \lambda\text{ to wartość własna macierzy A}\}$$
+Wartości własne macierzy możemy wyznaczyć następująco:
+$$ \det(A-\lambda I) = 0 $$
+\begin{equation}
+    \begin{vmatrix}
+        -2-\lambda & 1 \\
+        -1 & -2-\lambda
+    \end{vmatrix}
+    = 0
+\nonumber
+\end{equation}
+Wtedy:
+$$ (-2-\lambda)^2 + 1 = \lambda^2 + 4\lambda + 5 = 0 $$
+$$ \Delta = 4^2 - 4*5 = -4, \quad \sqrt{\Delta} = \pm2i $$
+$$ \lambda_1 = \frac{-4-2i}{2} = -2-i \quad \lambda_2 = \frac{-4+2i}{2} = -2+i $$
+$$ |\lambda_1| = \sqrt{5} \quad |\lambda_2| = \sqrt{5} $$
+$$ \lambda_{max} = \sqrt{5}$$
+Zatem metoda Eulera jest stabilna dla tego układu równań, gdy:
+$$ 0 < h < \frac{2}{\sqrt{5}} = \frac{2\sqrt{5}}{5}$$
+
+\subsection{Zadanie 6.}
+
+\section{Podsumowanie}
+
+\section{Bibliografia}
+
+\end{document}
