@@ -339,8 +339,8 @@ W tym przypadku błąd ponownie wzrasta w kolejnych węzłach. Tak jak dla $\alp
 
 \subsubsection{Empiryczny rząd zbieżności metody Eulera}
 Do wyznaczenia empirycznie rzędu zbieżności posłuży nam wzór:
-$$r = \ln{\frac{\varepsilon_k}{\varepsilon_{k+1}}} / \ln{\frac{\varepsilon_{k-1}}{\varepsilon_{k}}}$$
-gdzie $\varepsilon_k$ to wartość błędu w danym kroku $k$.
+$$r = \ln{\frac{\varepsilon_{h_k}}{\varepsilon_{h_n}}} / \ln{\frac{h_k}{h_n}}$$
+gdzie $\varepsilon_{h_i}$ to wartości błędu w kolejnych krokach dla kroku $h_i$.
 \\\\
 Poniżej przedstawione zostały wykresy przedstawiające empiryczny rząd zbieżności w kolejnych krokach metody Eulera.
 \begin{figure}[H]
