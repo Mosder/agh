@@ -305,7 +305,7 @@ Korzystając z $\sqrt{a} < 1$ ($a \geq 0$) $\iff a < 1$:
 $$5h^2 - 4h + 1 < 1$$
 $$5h^2 - 4h < 0$$
 $$h(5h - 4) < 0$$
-Zatem metoda Eulera jest stabilna dla $h \in [0;\frac{4}{5}]$.
+Zatem metoda Eulera jest stabilna dla $h \in ( 0;\frac{4}{5})$.
 
 \subsection{Zadanie 6.}
 W zadaniu podany był następujący problem początkowy:
@@ -339,8 +339,8 @@ W tym przypadku błąd ponownie wzrasta w kolejnych węzłach. Tak jak dla $\alp
 
 \subsubsection{Empiryczny rząd zbieżności metody Eulera}
 Do wyznaczenia empirycznie rzędu zbieżności posłuży nam wzór:
-$$r = \ln{\frac{\varepsilon_{h_k}}{\varepsilon_{h_n}}} / \ln{\frac{h_k}{h_n}}$$
-gdzie $\varepsilon_{h_i}$ to wartości błędu w kolejnych krokach dla kroku $h_i$.
+$$r = \ln{\frac{\varepsilon_{h_1}}{\varepsilon_{h_2}}} / \ln{\frac{h_1}{h_2}}$$
+gdzie $\varepsilon_{h_i}$ to wartości błędu w kolejnych krokach dla kroku $h_i$, $i=1,2$.
 \\\\
 Poniżej przedstawione zostały wykresy przedstawiające empiryczny rząd zbieżności w kolejnych krokach metody Eulera.
 \begin{figure}[H]
@@ -361,7 +361,7 @@ Poniżej przedstawione zostały wykresy przedstawiające empiryczny rząd zbież
     \caption{Empiryczny rząd zbieżności w kolejnych krokach dla $\alpha_3 = 1.1$}
     \label{fig:mesh}
 \end{figure}
-Jak widać z podanych wykresów (Rysunek 4, 5, 6), niezależnie od danego problemu, rząd zbieżności metody Eulera zbiega do 1, co jest zgodne z teorią.
+Jak widać z podanych wykresów (Rysunek 4, 5, 6), niezależnie od danego problemu, rząd zbieżności metody Eulera zbiega do 1, co jest zgodne z teorią. Ciekawe jest to, że dla tego problemu, empiryczny rząd zbieżności zaczyna od wartości większej niż teoretyczna i dopiero w następnych krokach się zmniejsza, zbiegając do wartości teoretycznej.
 
 \section{Podsumowanie}
 Zadania z tego laboratorium pokazały metody numerycznego rozwiązywania równań różniczkowych.
