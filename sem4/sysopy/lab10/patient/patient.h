@@ -1,5 +1,3 @@
-#include "../common.h"
-
 // patient strings
 #define PATIENT_ARRIVAL_STRING TIME_PATTERN" - Pacjent(%d): idę do szpitala, będę za %d s\n"
 #define PATIENT_STROLL_STRING TIME_PATTERN" - Pacjent(%d): za dużo pacjentów, wracam później za %d s\n"

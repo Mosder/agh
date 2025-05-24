@@ -1,8 +1,6 @@
-#include "../common.h"
-
 // doctor strings
 #define DOCTOR_WAKE_UP_STRING TIME_PATTERN" - Lekarz: budzę się\n"
-#define DOCTOR_VISIT_STRING TIME_PATTERN" - Lekarz: konsultuję pacjentów %d, %d, %d\n"
+#define DOCTOR_VISIT_STRING TIME_PATTERN" - Lekarz: konsultuję pacjentów %d"
 #define DOCTOR_DELIVERY_STRING TIME_PATTERN" - Lekarz: przyjmuję dostawę leków\n"
 #define DOCTOR_SLEEP_STRING TIME_PATTERN" - Lekarz: zasypiam\n"
 

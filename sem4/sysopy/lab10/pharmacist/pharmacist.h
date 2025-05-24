@@ -1,5 +1,3 @@
-#include "../common.h"
-
 // pharmacist strings
 #define PHARMACIST_ARRIVAL_STRING TIME_PATTERN" - Farmaceuta(%d): idę do szpitala, będę za %d s\n"
 #define PHARMACIST_WAITING_STRING TIME_PATTERN" - Farmaceuta(%d): czekam na opróżnienie apteczki\n"
