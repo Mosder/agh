@@ -1,12 +1,12 @@
 CC=gcc
 CFLAGS=-Wall
 
-all: example
+all: zad
 
-example: ex_client.c ex_server.c
-	$(CC) $(CFLAGS) ex_server.c -o ex_server
-	$(CC) $(CFLAGS) ex_client.c -o ex_client
+zad: client.c server.c
+	$(CC) $(CFLAGS) server.c -o server
+	$(CC) $(CFLAGS) client.c -o client
 
 .PHONY: clean
 clean:
-	rm ex_client ex_server
+	rm client server
