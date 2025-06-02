@@ -171,6 +171,7 @@ void* handle_client(void *args) {
     return NULL;
 }
 
+// count the number of connected clients
 int client_count() {
     int count = 0;
     pthread_mutex_lock(&clients_mutex);
