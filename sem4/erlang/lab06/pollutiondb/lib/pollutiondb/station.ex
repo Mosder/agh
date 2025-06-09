@@ -58,8 +58,8 @@ defmodule Pollutiondb.Station do
     station
     |> Ecto.Changeset.cast(changesmap, [:name, :lon, :lat])
     |> Ecto.Changeset.validate_required([:name, :lon, :lat])
-    |> Ecto.Changeset.validate_inclusion(:lon, 0..360)
-    |> Ecto.Changeset.validate_inclusion(:lat, -90..90)
+    |> Ecto.Changeset.validate_number(:lon, greater_than_or_equal_to: 0, less_than_or_equal_to: 360)
+    |> Ecto.Changeset.validate_number(:lat, greater_than_or_equal_to: -90, less_than_or_equal_to: 90)
   end
 
   def add(name, lon, lat) do
