@@ -9,7 +9,7 @@
 
 \title{Laboratorium 10 \\ Równania różniczkowe zwyczajne - część II}
 \author{Maciej Borowiec}
-\date{04.06.2025}
+\date{11.06.2025}
 
 \begin{document}
 
@@ -41,21 +41,27 @@ Zadanie należało rozwiązać jawną metodą Eulera, niejawną metodą Eulera, 
 Po rozwiązaniu układu tymi metodami, możemy przedstawić na wykresie otrzymane wyniki. Przedstawimy na początku liczebności populacji w zależności od czasu, a następnie portret fazowy układu.
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{1}
-    \caption{Populacja zajęcy oraz rysi w zależności od czasu dla danych metod}
+    \includegraphics[width=0.95\textwidth]{1a}
+    \caption{Populacja zajęcy w zależności od czasu dla danych metod}
     \label{fig:mesh}
 \end{figure}
-Na podanym wykresie (Rysunek 1) widzimy, że dla każdej z metod wynikowe funkcje zachowują się podobnie. Liczba ofiar osiąga wyższe wartości od liczby drapieżców, jednakże przy wzroście rysi liczba zajęcy szybko zaczyna spadać. Wraz z wzrostem czasu różnice w wynikach pomiędzy metodami się powiększają. Natomiast wartości dla metody półjawnej Eulera oraz metody RK4 są tak mało różne, że wykresy na rysunku się pokrywają.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{1b}
+    \caption{Populacja rysi w zależności od czasu dla danych metod}
+    \label{fig:mesh}
+\end{figure}
+Na podanych wykresach (Rysunek 1, 2) widzimy, że dla każdej z metod wynikowe funkcje zachowują się podobnie. Liczba ofiar osiąga wyższe wartości od liczby drapieżców, jednakże przy wzroście rysi liczba zajęcy szybko zaczyna spadać. Wraz z wzrostem czasu różnice w wynikach pomiędzy metodami się powiększają. Natomiast wartości dla metody półjawnej Eulera oraz metody RK4 są tak mało różne, że wykresy na rysunku się pokrywają.
 \begin{figure}[H]
     \centering
     \includegraphics[width=0.95\textwidth]{2}
     \caption{Portret fazowy układu dla danych metod}
     \label{fig:mesh}
 \end{figure}
-Na danym wykresie (Rysunek 2) łatwo zauważyć formujący się cykl. Można go łatwo wyjaśnić: wraz z wzrostem czasu rośnie populacja zajęcy, wraz z wzrostem populacji zajęcy przybywa więcej rysi, przybycie rysi powoduje zmalenie (poprzez śmierć) populacji zajęcy i wraz z tym maleniem rysie dokonują relokacji.
+Na danym wykresie (Rysunek 3) łatwo zauważyć formujący się cykl. Można go łatwo wyjaśnić: wraz z wzrostem czasu rośnie populacja zajęcy, wraz z wzrostem populacji zajęcy przybywa więcej rysi, przybycie rysi powoduje zmalenie (poprzez śmierć) populacji zajęcy i wraz z tym maleniem rysie dokonują relokacji.
 
 \subsection{Punkty stacjonarne układu}
-Chcemy znaleźć punkty stacjonarne układu, czyli punkty, dla których populacja nie będzie się zmieniać w czasie. Możemy się spodziewać wystąpienia ich (nie wliczając zdegenerowanego przypadku $x=0$, $y=0$) gdzieś w środku danego portretu fazowego widocznego na wykresie wyżej (Rysunek 2). Do znalezienia ich położenia wystarczy rozwiązać układ:
+Chcemy znaleźć punkty stacjonarne układu, czyli punkty, dla których populacja nie będzie się zmieniać w czasie. Możemy się spodziewać wystąpienia ich (nie wliczając zdegenerowanego przypadku $x=0$, $y=0$) gdzieś w środku danego portretu fazowego widocznego na wykresie wyżej (Rysunek 3). Do znalezienia ich położenia wystarczy rozwiązać układ:
 \begin{equation}
     x' = x(\alpha_1 - \beta_1y) = 0
 \end{equation}
@@ -103,7 +109,7 @@ Możemy te punkty przedstawić na wykresie razem z portretem fazowym.
     \caption{Portret fazowy układu dla danych metod wraz z punktami stacjonarnymi}
     \label{fig:mesh}
 \end{figure}
-Jak widać na wykresie (Rysunek 3), zgodnie z przewidywaniami, niezdegenerowany punkt stacjonarny znajduje się w "środku" cyklu portretu fazowego.
+Jak widać na wykresie (Rysunek 4), zgodnie z przewidywaniami, niezdegenerowany punkt stacjonarny znajduje się w "środku" cyklu portretu fazowego.
 
 \subsection{Niezmiennik}
 Chcemy zobaczyć, czy dla otrzymanych wyników zachowany jest niezmiennik:
@@ -115,7 +121,7 @@ W tym celu przedstawimy wykres wartości tego niezmiennika w zależności od cza
     \caption{Niezmiennik w zależności od czasu dla danych metod}
     \label{fig:mesh}
 \end{figure}
-Jak widać na przedstawionym rysunku (Rysunek 4), niezmiennik nie jest zachowany dla metody Eulera jawnej - wzrasta w czasie i metody Eulera niejawnej - maleje w czasie. Może to być zależne od błędu i/lub stabilności tych metod. Dla metody Eulera półjawnej niezmiennik również posiada zmiany w czasie, jednakże są one niewielkie i są ciągle mniejsze od danej stałej, tj. nie wzrasta, ani nie maleje, a oscyluje w okół jednej wartości. Natomiast dla metody Rungego-Kutty czwartego rzędu niezmiennik zachowuje jedną stałą wartość lub zmiany są tak niewielkie, że nie widać ich na wykresie.
+Jak widać na przedstawionym rysunku (Rysunek 5), niezmiennik nie jest zachowany dla metody Eulera jawnej - wzrasta w czasie i metody Eulera niejawnej - maleje w czasie. Może to być zależne od błędu i/lub stabilności tych metod. Dla metody Eulera półjawnej niezmiennik również posiada zmiany w czasie, jednakże są one niewielkie i są ciągle mniejsze od danej stałej, tj. nie wzrasta, ani nie maleje, a oscyluje w okół jednej wartości. Natomiast dla metody Rungego-Kutty czwartego rzędu niezmiennik zachowuje jedną stałą wartość lub zmiany są tak niewielkie, że nie widać ich na wykresie.
 
 \subsection{Znajdowanie parametrów układu dla prawdziwych danych}
 Mamy przedstawione prawdziwe dane dla populacji rysi i zajęcy przedstawione w pliku \textbf{LynxHare.txt}. Należało wybrać jedną z danych metod i oszacować prawdziwe wartości współczynników $\alpha_1, \alpha_2, \beta_1, \beta_2$. W tym celu trzeba było dokonać minimalizacji obu z danych niżej funkcji kosztu:
