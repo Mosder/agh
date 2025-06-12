@@ -6,15 +6,18 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <signal.h>
+#include <sys/select.h>
 
 #define MAX_NAME_LENGTH 50
 #define MAX_MESSAGE_LENGTH 1000
 
 int sock;
+struct sockaddr_in server_address;
+int server_len;
 
 // leave the server
 void client_leave() {
-    send(sock, "STOP\n", 5, MSG_DONTWAIT);
+    sendto(sock, "STOP\n", 5, MSG_DONTWAIT, (struct sockaddr*)&server_address, server_len);
     close(sock);
     raise(SIGKILL);
 }
@@ -24,9 +27,9 @@ void* receive_handler(void *args) {
     while (1) {
         char message[MAX_NAME_LENGTH + MAX_MESSAGE_LENGTH];
         memset(message, 0, sizeof(message));
-        read(sock, message, MAX_NAME_LENGTH + MAX_MESSAGE_LENGTH);
+        recvfrom(sock, message, MAX_NAME_LENGTH + MAX_MESSAGE_LENGTH, 0, (struct sockaddr*)&server_address, (socklen_t*)&server_len);
         // handle ping
-        if (strcmp(message, "PING") == 0) send(sock, "ALIVE", 6, MSG_DONTWAIT);
+        if (strcmp(message, "PING") == 0) sendto(sock, "ALIVE", 6, MSG_DONTWAIT, (struct sockaddr*)&server_address, server_len);
         // else, print received message
         else printf("%s", message);
     }
@@ -61,7 +64,7 @@ void* send_handler(void *args) {
             sprintf(message, "2ALL %s", buffer);
         }
 
-        send(sock, message, strlen(message), MSG_DONTWAIT);
+        sendto(sock, message, strlen(message), MSG_DONTWAIT, (struct sockaddr*)&server_address, server_len);
     }
     return NULL;
 }
@@ -78,18 +81,37 @@ int main(int argc, char *argv[]) {
     // handle ctrl-c
     signal(SIGINT, client_leave);
 
-    struct sockaddr_in server_address;
-
     // socket
-    sock = socket(AF_INET, SOCK_STREAM, 0);
+    sock = socket(AF_INET, SOCK_DGRAM, 0);
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(port);
     server_address.sin_addr.s_addr = inet_addr(ip);
-    connect(sock, (struct sockaddr *) &server_address, sizeof(server_address));
+    server_len = sizeof(server_address);
 
     // send name
-    send(sock, name, MAX_NAME_LENGTH, MSG_DONTWAIT);
+    sendto(sock, name, strlen(name), 0, (struct sockaddr*)&server_address, server_len);
+
+    // accept set
+    fd_set fdaccept;
+    FD_ZERO(&fdaccept);
+    FD_SET(sock, &fdaccept);
+
+    // wait 2 secs for response
+    struct timeval timeout;
+    timeout.tv_sec = 2;
+    timeout.tv_usec = 0;
+    int ready = select(sock+1, &fdaccept, NULL, NULL, &timeout);
+    if (ready <= 0) {
+        printf("Couldn't connect to server\n");
+        return 2;
+    }
+
+    // receive accept
+    char buffer[7];
+    memset(buffer, 0, sizeof(buffer));
+    recvfrom(sock, buffer, 7, 0, (struct sockaddr*)&server_address, (socklen_t*)&server_len);
+    memset(buffer, 0, sizeof(buffer));
 
     printf("Connected to server\n");
     printf("Possible actions:\n");

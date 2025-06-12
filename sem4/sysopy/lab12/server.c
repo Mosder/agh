@@ -12,11 +12,11 @@
 
 typedef struct {
     struct sockaddr_in address;
-    int socket;
     char name[MAX_NAME_LENGTH];
     int alive;
 } client_info;
 
+int server_socket;
 client_info *clients[MAX_CLIENTS];
 pthread_mutex_t clients_mutex = PTHREAD_MUTEX_INITIALIZER;
 
@@ -25,7 +25,7 @@ void ping_clients() {
     pthread_mutex_lock(&clients_mutex);
     for (int i = 0; i < MAX_CLIENTS; i++) {
         if (clients[i]) {
-            write(clients[i]->socket, "PING", 5);
+            sendto(server_socket, "PING", 5, 0, (struct sockaddr*)&clients[i]->address, sizeof(clients[i]->address));
         }
     }
     pthread_mutex_unlock(&clients_mutex);
@@ -84,7 +84,7 @@ void send_to_all(char *message, client_info *sender) {
     pthread_mutex_lock(&clients_mutex);
     for (int i = 0; i < MAX_CLIENTS; i++) {
         if (clients[i] && clients[i] != sender) {
-            write(clients[i]->socket, message, strlen(message));
+            sendto(server_socket, message, strlen(message), 0, (struct sockaddr*)&clients[i]->address, sizeof(clients[i]->address));
         }
     }
     pthread_mutex_unlock(&clients_mutex);
@@ -96,7 +96,7 @@ void send_to_one(char *message, char *recipient) {
     for (int i = 0; i < MAX_CLIENTS; i++) {
         if (clients[i]) {
             if (strcmp(clients[i]->name, recipient) == 0) {
-                write(clients[i]->socket, message, strlen(message));
+                sendto(server_socket, message, strlen(message), 0, (struct sockaddr*)&clients[i]->address, sizeof(clients[i]->address));
                 break;
             }
         }
@@ -130,47 +130,39 @@ void confirm_response(client_info *info) {
 }
 
 // handle client requests
-void* handle_client(void *args) {
-    client_info *info = (client_info*)args;
-    while(1) {
-        char buffer[MAX_MESSAGE_LENGTH];
-        memset(buffer, 0, sizeof(buffer));
-        read(info->socket, buffer, MAX_MESSAGE_LENGTH);
-        // LIST
-        if (strncmp(buffer, "LIST", 4) == 0) {
-            char users[MAX_MESSAGE_LENGTH];
-            get_users(users);
-            write(info->socket, users, strlen(users));
-        }
-        // 2ALL
-        else if(strncmp(buffer, "2ALL", 4) == 0) {
-            char message[MAX_NAME_LENGTH + MAX_MESSAGE_LENGTH];
-            sprintf(message, "[%s]: %s", info->name, buffer + 5);
-            send_to_all(message, info);
-        }
-        // 2ONE
-        else if(strncmp(buffer, "2ONE", 4) == 0) {
-            char message[MAX_NAME_LENGTH + MAX_MESSAGE_LENGTH];
-            char *recipient = strtok(buffer+5, " ");
-            char *content = strtok(NULL, " ");
-            sprintf(message, "(whisper) [%s]: %s", info->name, content);
-            send_to_one(message, recipient);
-        }
-        // STOP
-        else if(strncmp(buffer, "STOP", 4) == 0) {
-            remove_client(info);
-            close(info->socket);
-            free(info);
-            break;
-        }
-        // ALIVE
-        else if(strncmp(buffer, "ALIVE", 5) == 0) {
-            confirm_response(info);
-        }
+void handle_request(client_info *info, char* buffer) {
+    // LIST
+    if (strncmp(buffer, "LIST", 4) == 0) {
+        char users[MAX_MESSAGE_LENGTH];
+        get_users(users);
+        sendto(server_socket, users, strlen(users), 0, (struct sockaddr*)&info->address, sizeof(info->address));
     }
-    return NULL;
+    // 2ALL
+    else if(strncmp(buffer, "2ALL", 4) == 0) {
+        char message[MAX_NAME_LENGTH + MAX_MESSAGE_LENGTH];
+        sprintf(message, "[%s]: %s", info->name, buffer + 5);
+        send_to_all(message, info);
+    }
+    // 2ONE
+    else if(strncmp(buffer, "2ONE", 4) == 0) {
+        char message[MAX_NAME_LENGTH + MAX_MESSAGE_LENGTH];
+        char *recipient = strtok(buffer+5, " ");
+        char *content = strtok(NULL, " ");
+        sprintf(message, "(whisper) [%s]: %s", info->name, content);
+        send_to_one(message, recipient);
+    }
+    // STOP
+    else if(strncmp(buffer, "STOP", 4) == 0) {
+        remove_client(info);
+        free(info);
+    }
+    // ALIVE
+    else if(strncmp(buffer, "ALIVE", 5) == 0) {
+        confirm_response(info);
+    }
 }
 
+// count clients
 int client_count() {
     int count = 0;
     pthread_mutex_lock(&clients_mutex);
@@ -181,6 +173,21 @@ int client_count() {
     return count;
 }
 
+// check if client exists, if so, return info, else NULL
+client_info* get_client_info(const struct sockaddr_in *address) {
+    pthread_mutex_lock(&clients_mutex);
+    for (int i = 0; i < MAX_CLIENTS; i++) {
+        if (clients[i]) {
+            if (memcmp(&clients[i]->address, address, sizeof(struct sockaddr_in)) == 0) {
+                pthread_mutex_unlock(&clients_mutex);
+                return clients[i];
+            }
+        }
+    }
+    pthread_mutex_unlock(&clients_mutex);
+    return NULL;
+}
+
 int main(int argc, char *argv[]) {
     if (argc != 3) {
         printf("Incorrect number of arguments\n");
@@ -189,11 +196,10 @@ int main(int argc, char *argv[]) {
     char *ip = argv[1];
     int port = atoi(argv[2]);
 
-    int server_socket, client_socket;
     struct sockaddr_in server_address, client_address;
 
     // server socket
-    server_socket = socket(AF_INET, SOCK_STREAM, 0);
+    server_socket = socket(AF_INET, SOCK_DGRAM, 0);
     memset(&server_address, 0, sizeof(server_address));
     server_address.sin_family = AF_INET;
     server_address.sin_port = htons(port);
@@ -202,7 +208,6 @@ int main(int argc, char *argv[]) {
     int option = 1;
     setsockopt(server_socket, SOL_SOCKET, SO_REUSEADDR, &option, sizeof(option));
     bind(server_socket, (struct sockaddr *) &server_address, sizeof(server_address));
-    listen(server_socket, MAX_CLIENTS);
     printf("Server started\n");
 
     // pinging thread
@@ -210,28 +215,32 @@ int main(int argc, char *argv[]) {
     pthread_create(&pinging_thread, NULL, &handle_pinging, NULL);
 
     while(1) {
+        char buffer[MAX_MESSAGE_LENGTH];
+        memset(buffer, 0, MAX_MESSAGE_LENGTH);
         int client_len = sizeof(client_address);
-        client_socket = accept(server_socket, (struct sockaddr*)&client_address, (socklen_t*)&client_len);
+        recvfrom(server_socket, buffer, MAX_MESSAGE_LENGTH, 0, (struct sockaddr*)&client_address, (socklen_t*)&client_len);
+
+        // if client exists, handle request
+        client_info *info = get_client_info(&client_address);
+        if (info) {
+            handle_request(info, buffer);
+            continue;
+        }
 
         // if no space, don't add the new client
         if (client_count() >= MAX_CLIENTS) {
             printf("Couldn't accept client - max count reached.\n");
-            close(client_socket);
             continue;
         }
 
-        // create new client info
-        client_info *info = (client_info*)malloc(sizeof(client_info));
-        info->address = client_address;
-        info->socket = client_socket;
-        info->alive = 1;
-        read(client_socket, info->name, MAX_NAME_LENGTH);
-
-        // add client and create handling thread
-        add_client(info);
-        printf("Added new client - %s\n", info->name);
-        pthread_t client_thread;
-        pthread_create(&client_thread, NULL, &handle_client, (void*)info);
+        // create new client
+        client_info *new_info = (client_info*)malloc(sizeof(client_info));
+        new_info->address = client_address;
+        new_info->alive = 1;
+        strcpy(new_info->name, buffer);
+        add_client(new_info);
+        sendto(server_socket, "ACCEPT", 7, 0, (struct sockaddr*)&new_info->address, sizeof(new_info->address));
+        printf("Added new client - %s\n", new_info->name);
     }
 
     return 0;
