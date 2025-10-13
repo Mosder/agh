@@ -6,6 +6,7 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d7c9df-25d5-49db-953b-53703b091c5d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/labs/lab1/Main.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -40,33 +41,81 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Build tw.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab1.Main.main()].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;/home/mosder/agh/sem5/tw/src/main/java/org/example/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;reference.settings.project.maven.importing&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.Main.executor": "Run",
+    "Gradle.Build tw.executor": "Run",
+    "Gradle.tw [:labs.lab1.CounterMain.main()].executor": "Run",
+    "Gradle.tw [:labs.lab1.CounterSynchronized.main()].executor": "Run",
+    "Gradle.tw [:labs.lab1.CounterUnsynchronized.main()].executor": "Run",
+    "Gradle.tw [:labs.lab1.Main.main()].executor": "Run",
+    "Gradle.tw [:labs.lab1.ProducerConsumer.main()].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "/home/mosder/agh/sem5/tw/src/main/java/org/example/Main.java",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
-  <component name="RunManager">
-    <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="labs.lab1.Main" />
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="labs.lab1" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.ProducerConsumer">
+    <configuration name="CounterMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="labs.lab1.CounterMain" />
+      <module name="tw.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="labs.lab1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CounterSynchronized" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="labs.lab1.CounterSynchronized" />
+      <module name="tw.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="labs.lab1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="CounterUnsynchronized" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="labs.lab1.CounterUnsynchronized" />
+      <module name="tw.main" />
+      <extension name="coverage">
+        <pattern>
+          <option name="PATTERN" value="labs.lab1.*" />
+          <option name="ENABLED" value="true" />
+        </pattern>
+      </extension>
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="ProducerConsumer" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="labs.lab1.ProducerConsumer" />
       <module name="tw.main" />
       <extension name="coverage">
         <pattern>
@@ -80,7 +129,10 @@
     </configuration>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.Main" />
+        <item itemvalue="Application.ProducerConsumer" />
+        <item itemvalue="Application.CounterSynchronized" />
+        <item itemvalue="Application.CounterUnsynchronized" />
+        <item itemvalue="Application.CounterMain" />
       </list>
     </recent_temporary>
   </component>
@@ -101,6 +153,8 @@
       <updated>1759830085811</updated>
       <workItem from="1759830953373" duration="880000" />
       <workItem from="1759941409608" duration="3000" />
+      <workItem from="1760346697045" duration="3777000" />
+      <workItem from="1760354031491" duration="3390000" />
     </task>
     <servers />
   </component>
