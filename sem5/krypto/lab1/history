@@ -1,0 +1,53 @@
+  541  echo test > test_symmetric
+  542  gpg -c test_symmetric 
+  543  ls
+  544  cat test_symmetric.gpg 
+  545  gpg -o test_symmetric_decrypted -d test_symmetric.gpg 
+  546  ls
+  547  gpg list-keys
+  548  gpg --list-keys
+  549  gpg --delete-keys mosder
+  550  gpg --delete-secret-keys mosder
+  551  gpg --list-keys
+  552  gpg --delete-keys mosder
+  553  gpg --list-keys
+  554  gpg --list-secret-keys
+  555  history
+  556  gpg --full-gen-key
+  557  gpg --export mosder
+  558  gpg --export mosder --output key_export
+  559  gpg --output key_export --export mosder
+  560  ls
+  561  cat key_export 
+  562  mv key_export export_key_mosder
+  563  gpg --import export_key_andrzej 
+  564  gpg -k
+  565  echo secret_information_from_mosder > mosder_secret_info
+  566  gpg -e -r andrzej mosder_secret_info 
+  567  ls
+  568  gpg -d andrzej_secret_info.gpg 
+  569  cat andrzej_secret_info.gpg 
+  570  gpg -o andrzej_secret_info -d andrzej_secret_info.gpg 
+  571  cat andrzej_secret_info
+  572  cat
+  573  ls
+  574  vim *
+  575  gpg --card-edit
+  576  gpg -k
+  577  echo yubikey_test_secret_information > yubikey_test
+  578  gpg -e -r mosder yubikey_test 
+  579  ls
+  580  rm yubikey_test*
+  581  gpg --edit-card
+  582  echo yubi_secret > yubi_info
+  583  gpg -e -r yubi yubi_info 
+  584  ls
+  585  gpg -o yubi_decrypt -d yubi_info.gpg 
+  586  gpg -o yubi_decrypt -d yubi_info.gpg 
+  587  cat yubi_decrypt 
+  588  cat yubi_info
+  589  gpg --export yubi -o yubi_export
+  590  gpg -o yubi_export --export yubi
+  591  ls
+  592  history
+  593  history > history
