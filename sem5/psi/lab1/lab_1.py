@@ -730,7 +730,7 @@ X_train, X_test, y_train, y_test = train_test_split(
 #
 # **Uwaga:** przekaż do `ColumnTransformer` parametr `verbose_feature_names_out=False`, żeby nie zmieniał on nazw cech. Ułatwi nam to późniejszą analizę wyników.
 
-# %% editable=true slideshow={"slide_type": ""} tags=["ex"]
+# %% editable=true slideshow={"slide_type": ""}
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -1239,7 +1239,7 @@ df_nan
 # %% [markdown]
 # Jak widać, nie ma wartości brakujących w tym zbiorze danych.
 
-# %% editable=true slideshow={"slide_type": ""} tags=["ex"]
+# %% editable=true slideshow={"slide_type": ""}
 # plot class frequencies
 ax = pd.DataFrame({'y': np.array(y.value_counts(normalize=True))}, index=['0', '1']).plot.bar()
 ax.bar_label(ax.containers[0])
