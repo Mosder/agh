@@ -311,13 +311,13 @@ from imblearn.over_sampling import SMOTE
 sm = SMOTE(random_state=0)
 X_train, y_train = sm.fit_resample(X_train, y_train)
 
-clf = DecisionTreeClassifier(criterion="entropy", random_state=0)
-clf.fit(X_train, y_train)
+model_tree = DecisionTreeClassifier(criterion="entropy", random_state=0)
+model_tree.fit(X_train, y_train)
 
 rfc = RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=0, n_jobs=-1)
 rfc.fit(X_train, y_train)
 
-tree_roc = roc_auc_score(y_test, clf.predict_proba(X_test)[:, 1])
+tree_roc = roc_auc_score(y_test, model_tree.predict_proba(X_test)[:, 1])
 print(f"Tree AUROC: {tree_roc}")
 forest_roc = roc_auc_score(y_test, rfc.predict_proba(X_test)[:, 1])
 print(f"Forest AUROC: {forest_roc}")
@@ -362,9 +362,9 @@ print("Solution is correct!")
 from sklearn.model_selection import GridSearchCV
 
 rfc = RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=0, n_jobs=-1)
-
 gscv = GridSearchCV(rfc, {'max_features': [0.1, 0.2, 0.3, 0.4, 0.5]}, cv=5, scoring="roc_auc", verbose=2)
 gscv.fit(X_train, y_train)
+model_forest = gscv.best_estimator_
 
 print(f"Best max feature param: {gscv.best_params_["max_features"]}")
 auroc = roc_auc_score(y_test, gscv.predict_proba(X_test)[:,1])
@@ -422,9 +422,11 @@ print("Solution is correct!")
 from lightgbm import LGBMClassifier
 
 lgbm = LGBMClassifier(importance_type="gain", random_state=0, n_jobs=-1)
-lgbm.fit(X_train, y_train)
+# use pd.DataFrame to avoid warnings
+lgbm.fit(pd.DataFrame(X_train), y_train)
 
-auroc = roc_auc_score(y_test, lgbm.predict_proba(X_test)[:,1])
+# use pd.DataFrame to avoid warnings
+auroc = roc_auc_score(y_test, lgbm.predict_proba(pd.DataFrame(X_test))[:,1])
 print(f"AUROC: {auroc}")
 
 
@@ -474,6 +476,11 @@ print("Solution is correct!")
 
 # %% editable=true pycharm={"is_executing": true, "name": "#%%\n"} slideshow={"slide_type": ""} tags=["ex"]
 from sklearn.model_selection import RandomizedSearchCV
+from sklearn.metrics import classification_report
+
+lgbm = LGBMClassifier(importance_type="gain", random_state=0, verbose=-1, n_jobs=-1)
+# use pd.DataFrame to avoid warnings
+lgbm.fit(pd.DataFrame(X_train), y_train)
 
 param_grid = {
     "n_estimators": [100, 250, 500],
@@ -482,33 +489,43 @@ param_grid = {
     "colsample_bytree": [0.8, 0.9, 1.0],
     "subsample": [0.8, 0.9, 1.0],
 }
-lgbm = LGBMClassifier(importance_type="gain", random_state=0, verbose=-1, n_jobs=1)
-rscv = RandomizedSearchCV(lgbm, param_grid, n_iter=30, verbose=2, n_jobs=-1, scoring="roc_auc", random_state=0)
-rscv.fit(X_train, y_train)
+rscv = RandomizedSearchCV(
+    LGBMClassifier(importance_type="gain", random_state=0, verbose=-1, n_jobs=1),
+    param_grid,
+    n_iter=50,
+    verbose=0,
+    n_jobs=-1,
+    scoring="roc_auc",
+    random_state=0
+)
+# use pd.DataFrame to avoid warnings
+rscv.fit(pd.DataFrame(X_train), y_train)
+model_boosting = rscv.best_estimator_
 
-
-# %%
 print("Best params:")
-[print(f"{p}: {rscv.best_params_[p]") for p in param_grid.keys()]
+[print(f"{p}: {rscv.best_params_[p]}") for p in param_grid.keys()]
 
-lgbm = LGBMClassifier(importance_type="gain", random_state=0, verbose=-1, n_jobs=-1)
-lgbm.fit(X_train, y_train)
-print("No tuning report:")
-print(classification_report(y_test, lgbm.predict(X_test)))
+print("\nNo tuning report:")
+# use pd.DataFrame to avoid warnings
+print(classification_report(y_test, lgbm.predict(pd.DataFrame(X_test))))
 
 print("Tuning report:")
-print(classification_report(y_test, rscv.predict(X_test)))
+# use pd.DataFrame to avoid warnings
+print(classification_report(y_test, rscv.predict(pd.DataFrame(X_test))))
 
-auroc = roc_auc_score(y_test, rscv.predict_proba(X_test)[:,1])
+# use pd.DataFrame to avoid warnings
+auroc = roc_auc_score(y_test, rscv.predict_proba(pd.DataFrame(X_test))[:,1])
 print(f"AUROC: {auroc}")
+
 
 # %% editable=true slideshow={"slide_type": ""} tags=["ex"]
 assert 0.9 <= auroc <= 0.99
 
 print("Solution is correct!")
 
+
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""} tags=["ex"]
-# // skomentuj tutaj
+# Przez tuning hiperparametrów nastąpiło zwiększenie wartości <b>precision</b> i zmniejszenie wartości <b>recall</b>. Jest to raczej nie pożądane zjawisko dla banków chcących udzielić kredyt lub dla inwestorów, ponieważ raczej chcemy mieć jak największą pewność, że to w co zainwestujemy nie zbankrutuje, co jest wartością mierzoną przez <b>recall</b>. Natomiast jeśli np. dysponowalibyśmy ogromnym budżetem i chcielibyśmy dokonać jak najwięcej inwestycji, akceptując to, że część z nich by się nie powiodła, to wtedy interesowałaby nas maksymalizacjia właśnie wartości <b>precision</b>.
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""}
 # **Boosting - podsumowanie**
@@ -555,11 +572,27 @@ print("Solution is correct!")
 # **Uwaga:** Scikit-learn normalizuje ważności do zakresu [0, 1], natomiast LightGBM nie. Musisz to znormalizować samodzielnie, dzieląc przez sumę.
 
 # %% editable=true slideshow={"slide_type": ""} tags=["ex"]
-# your_code
+def plot_most_important_features(importances, model_name):
+    best5_indices = np.argsort(importances)[-5:]
+    plt.barh(np.array(feature_names)[best5_indices], importances[best5_indices])
+    plt.xlabel("importance")
+    plt.title(f"5 most important features for {model_name} model")
 
+
+# %%
+tree_importances = model_tree.feature_importances_
+plot_most_important_features(tree_importances, "tree")
+
+# %%
+forest_importances = model_forest.feature_importances_
+plot_most_important_features(forest_importances, "forest")
+
+# %%
+boosting_importances = model_boosting.feature_importances_/np.sum(model_boosting.feature_importances_)
+plot_most_important_features(boosting_importances, "boosting")
 
 # %% [markdown] editable=true slideshow={"slide_type": ""} tags=["ex"]
-# // skomentuj tutaj
+# Moim zdaniem wybrane cechy mają sens. Najważniejszymi cechami w każdym z modelu okazały się być <b>sales (n) / sales (n-1)</b> (co pokazuje zmianę w sprzedażach w kolejnych latach), <b>profit on operating activities / financial expenses</b> (co pokazuje zyski względem wydatków). Obie te cechy są bardzo istotne w ustaleniu czy firma zwiększa swoje zyski, czy idzie w stronę bankructwa.
 
 # %% [markdown]
 # ### Dla zainteresowanych
@@ -593,3 +626,57 @@ print("Solution is correct!")
 # - Boruta (wrapper method), stworzony na Uniwersytecie Warszawskim, łączący Random Forest oraz testy statystyczne (biblioteka `boruta_py`): [link 1](https://towardsdatascience.com/boruta-explained-the-way-i-wish-someone-explained-it-to-me-4489d70e154a), [link 2](https://danielhomola.com/feature%20selection/phd/borutapy-an-all-relevant-feature-selection-method/)
 
 # %% editable=true pycharm={"name": "#%%\n"} slideshow={"slide_type": ""} tags=["ex"]
+from sklearn.feature_selection import SelectPercentile, mutual_info_classif, RFE
+
+# no selection
+def no_selection(clf, X_train, y_train, X_test, y_test):
+    # use pd.DataFrame to avoid warnings with lgbm
+    clf.fit(pd.DataFrame(X_train), y_train)
+    return roc_auc_score(y_test, clf.predict_proba(pd.DataFrame(X_test))[:,1])
+
+# filter method
+def filter_method(clf, X_train, y_train, X_test, y_test):
+    sel = SelectPercentile(mutual_info_classif, percentile=80)
+    X_train = sel.fit_transform(X_train, y_train)
+    X_test = sel.transform(X_test)
+    # use pd.DataFrame to avoid warnings with lgbm
+    clf.fit(pd.DataFrame(X_train), y_train)
+    return roc_auc_score(y_test, clf.predict_proba(pd.DataFrame(X_test))[:,1])
+
+# embedded method
+def embedded_method(clf, importances, X_train, y_train, X_test, y_test):
+    selected = np.argsort(importances)[np.int64(.2*importances.shape[0])+1:]
+    X_train = X_train[:, selected]
+    X_test = X_test[:, selected]
+    # use pd.DataFrame to avoid warnings with lgbm
+    clf.fit(pd.DataFrame(X_train), y_train)
+    return roc_auc_score(y_test, clf.predict_proba(pd.DataFrame(X_test))[:,1])
+
+# wrapper method
+def wrapper_method(clf, X_train, y_train, X_test, y_test):
+    rfe = RFE(clf, n_features_to_select=.8)
+    # use pd.DataFrame to avoid warnings with lgbm
+    rfe.fit(pd.DataFrame(X_train), y_train)
+    return roc_auc_score(y_test, rfe.predict_proba(pd.DataFrame(X_test))[:,1])
+
+# compare methods
+def compare_methods(clf, name, importances, X_train, y_train, X_test, y_test):
+    nosel = no_selection(clf, X_train, y_train, X_test, y_test)
+    fil = filter_method(clf, X_train, y_train, X_test, y_test)
+    emb = embedded_method(clf, importances, X_train, y_train, X_test, y_test)
+    wrp = wrapper_method(clf, X_train, y_train, X_test, y_test)
+    print("\t\tno selection\tfilter method\tembedded method\twrapper method")
+    print(name, end="\t")
+    for auroc in [nosel, fil, emb, wrp]:
+        print(f"{auroc:.7f}", end="\t")
+    print()
+
+
+# %%
+rfc = RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=0, n_jobs=-1)
+lgbm = LGBMClassifier(importance_type="gain", random_state=0, n_jobs=-1)
+compare_methods(rfc, "Random Forest", forest_importances, X_train, y_train, X_test, y_test)
+compare_methods(lgbm, "LightGBM", boosting_importances, X_train, y_train, X_test, y_test)
+
+# %% [markdown]
+# W przypadku użycia metody filtrującej wyniki okazały się być gorsze niż bez selekcji. Wyniki przy użyciu metody embedded polepszyły się - nie jest to duże polepszenie, ale w zależności od dostępnego sprzętu i tego jak bardzo nam zależy na dokładności modelu, może być użyteczne. W przypadku metody wrapper polepszenie względem metody embedded było bardzo niewielkie (w przypadku LightGBM nawet to było pogorszenie) zatem biorąc pod uwagę dłuższy czas trwania tej metody raczej nie jest warta stosowania w tym przypadku.
