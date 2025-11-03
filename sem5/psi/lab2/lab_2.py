@@ -215,10 +215,9 @@ print(f"AUROC: {auroc}")
 assert auroc > 0.7
 
 print("Solution is correct!")
-raise Exception("HERE")
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""} tags=["ex"]
-# // skomentuj tutaj
+# Wiedząc, że AUROC osiąga wartości z przedziału [0;1], jest to wartość nienajniższa. Jednakże raczej chcielibyśmy, by była ona większa - conajmniej 0.9.
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""}
 # ## Uczenie zespołowe, bagging, lasy losowe
@@ -256,7 +255,13 @@ raise Exception("HERE")
 # **Uwaga:** pamiętaj o ustawieniu `random_state=0`. Dla przyspieszenia ustaw `n_jobs=-1` (użyje tylu procesów, ile masz dostępnych rdzeni procesora). Pamiętaj też o przekazaniu prawdopodobieństw do metryki AUROC.
 
 # %% editable=true pycharm={"name": "#%%\n"} slideshow={"slide_type": ""} tags=["ex"]
-# your_code
+from sklearn.ensemble import RandomForestClassifier
+
+rfc = RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=0, n_jobs=-1)
+rfc.fit(X_train, y_train)
+
+auroc = roc_auc_score(y_test, rfc.predict_proba(X_test)[:, 1])
+print(f"AUROC: {auroc}")
 
 
 # %% editable=true slideshow={"slide_type": ""} tags=["ex"]
@@ -265,7 +270,7 @@ assert auroc > 0.85
 print("Solution is correct!")
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""} tags=["ex"]
-# // skomentuj tutaj
+# AUROC w tym przypadku jest zdecydowanie lepszy niż dla drzewa decyzyjnego. Jest to już wartość, którą można uznać za dobrą, lecz chcielibyśmy najchętniej ją jeszcze bardzie zwiększyć.
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""}
 # Jak zobaczymy poniżej, wynik ten możemy jednak jeszcze ulepszyć!
@@ -301,7 +306,21 @@ print("Solution is correct!")
 # Wartość ROC drzewa decyzyjnego przypisz do zmiennej `tree_roc`, a lasu do `forest_roc`.
 
 # %% editable=true pycharm={"name": "#%%\n"} slideshow={"slide_type": ""} tags=["ex"]
-# your_code
+from imblearn.over_sampling import SMOTE
+
+sm = SMOTE(random_state=0)
+X_train, y_train = sm.fit_resample(X_train, y_train)
+
+clf = DecisionTreeClassifier(criterion="entropy", random_state=0)
+clf.fit(X_train, y_train)
+
+rfc = RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=0, n_jobs=-1)
+rfc.fit(X_train, y_train)
+
+tree_roc = roc_auc_score(y_test, clf.predict_proba(X_test)[:, 1])
+print(f"Tree AUROC: {tree_roc}")
+forest_roc = roc_auc_score(y_test, rfc.predict_proba(X_test)[:, 1])
+print(f"Forest AUROC: {forest_roc}")
 
 
 # %% editable=true slideshow={"slide_type": ""} tags=["ex"]
@@ -311,7 +330,7 @@ assert 0.8 < forest_roc < 0.95
 print("Solution is correct!")
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""} tags=["ex"]
-# // skomentuj tutaj
+# Różnice AUROC dla obu przypadków nie są ogromne, ale są zauważalne. Ciekawym jest to, że w przypadku drzewa decyzyjnego ta wartość zmalała, co oczywiśnie nie jest porządanym efektem.
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""}
 # W dalszej części laboratorium używaj zbioru po zastosowaniu SMOTE do treningu klasyfikatorów.
@@ -340,7 +359,16 @@ print("Solution is correct!")
 # - pamiętaj, żeby jako estymatora przekazanego do grid search'a użyć instancji Random Forest, która ma już ustawione `random_state=0` i `n_jobs`
 
 # %% editable=true pycharm={"is_executing": true, "name": "#%%\n"} slideshow={"slide_type": ""} tags=["ex"]
-# your_code
+from sklearn.model_selection import GridSearchCV
+
+rfc = RandomForestClassifier(n_estimators=500, criterion="entropy", random_state=0, n_jobs=-1)
+
+gscv = GridSearchCV(rfc, {'max_features': [0.1, 0.2, 0.3, 0.4, 0.5]}, cv=5, scoring="roc_auc", verbose=2)
+gscv.fit(X_train, y_train)
+
+print(f"Best max feature param: {gscv.best_params_["max_features"]}")
+auroc = roc_auc_score(y_test, gscv.predict_proba(X_test)[:,1])
+print(f"AUROC: {auroc}")
 
 
 # %% editable=true slideshow={"slide_type": ""} tags=["ex"]
@@ -349,7 +377,7 @@ assert 0.9 <= auroc <= 0.95
 print("Solution is correct!")
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""} tags=["ex"]
-# // skomentuj tutaj
+# Patrząc na to, że AUROC się polepszyło o mniej niż 0.01, to spędzenie kilku dodatkowych minut nie wydaje się mieć za dużo sensu. Jednakże to zależy bardzo od tego jak bardzo ważna jest dokładność naszego modelu. Należy też zwrócić uwagę na to, że kilka minut na laptopie stałoby się maksymalnie kilkoma sekundami na lepszym sprzęcie, i wtedy zdecydowanie warto by było z tego skorzystać.
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""}
 # W praktycznych zastosowaniach osoba trenująca model wedle własnego uznana, doświadczenia, dostępnego czasu i zasobów wybiera, czy dostrajać hiperparametry i w jak szerokim zakresie. Dla Random Forest na szczęście często może nie być znaczącej potrzeby i za to go lubimy :)
@@ -391,7 +419,13 @@ print("Solution is correct!")
 # Pamiętaj o `random_state`, `n_jobs` i prawdopodobieństwach dla AUROC.
 
 # %% editable=true pycharm={"is_executing": true, "name": "#%%\n"} slideshow={"slide_type": ""} tags=["ex"]
-# your_code
+from lightgbm import LGBMClassifier
+
+lgbm = LGBMClassifier(importance_type="gain", random_state=0, n_jobs=-1)
+lgbm.fit(X_train, y_train)
+
+auroc = roc_auc_score(y_test, lgbm.predict_proba(X_test)[:,1])
+print(f"AUROC: {auroc}")
 
 
 # %% editable=true slideshow={"slide_type": ""} tags=["ex"]
@@ -400,7 +434,7 @@ assert 0.9 <= auroc <= 0.97
 print("Solution is correct!")
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""} tags=["ex"]
-# // skomentuj tutaj
+# Boosting okazał się bardzo dobrym wyborem. W bardzo krótkim czasie zdołał osiągnąć dużo lepszy AUROC niż poprzednie sposoby.
 
 # %% [markdown] editable=true pycharm={"name": "#%% md\n"} slideshow={"slide_type": ""}
 # Boosting dzięki uczeniu na poprzednich drzewach redukuje nie tylko wariancję, ale też bias w błędzie, dzięki czemu może w wielu przypadkach osiągnąć lepsze rezultaty od lasu losowego. Do tego dzięki znakomitej implementacji LightGBM jest szybszy.
@@ -439,8 +473,34 @@ print("Solution is correct!")
 # - nie ustawiaj wszędzie `n_jobs=-1`, bo wtedy stworzysz więcej procesów niż rdzeni i spowodujesz thread contention
 
 # %% editable=true pycharm={"is_executing": true, "name": "#%%\n"} slideshow={"slide_type": ""} tags=["ex"]
-# your_code
+from sklearn.model_selection import RandomizedSearchCV
 
+param_grid = {
+    "n_estimators": [100, 250, 500],
+    "learning_rate": [0.05, 0.1, 0.2],
+    "num_leaves": [31, 48, 64],
+    "colsample_bytree": [0.8, 0.9, 1.0],
+    "subsample": [0.8, 0.9, 1.0],
+}
+lgbm = LGBMClassifier(importance_type="gain", random_state=0, verbose=-1, n_jobs=1)
+rscv = RandomizedSearchCV(lgbm, param_grid, n_iter=30, verbose=2, n_jobs=-1, scoring="roc_auc", random_state=0)
+rscv.fit(X_train, y_train)
+
+
+# %%
+print("Best params:")
+[print(f"{p}: {rscv.best_params_[p]") for p in param_grid.keys()]
+
+lgbm = LGBMClassifier(importance_type="gain", random_state=0, verbose=-1, n_jobs=-1)
+lgbm.fit(X_train, y_train)
+print("No tuning report:")
+print(classification_report(y_test, lgbm.predict(X_test)))
+
+print("Tuning report:")
+print(classification_report(y_test, rscv.predict(X_test)))
+
+auroc = roc_auc_score(y_test, rscv.predict_proba(X_test)[:,1])
+print(f"AUROC: {auroc}")
 
 # %% editable=true slideshow={"slide_type": ""} tags=["ex"]
 assert 0.9 <= auroc <= 0.99
