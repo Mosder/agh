@@ -4,22 +4,25 @@ public class Main {
     private final static int M = 50;
     private final static int PRODUCER_COUNT = 10;
     private final static int CONSUMER_COUNT = 10;
+    private final static int MIN_WAIT = 0;
+    private final static int MAX_WAIT = 1;
+    private final static boolean FAIR = true;
 
     public static void main(String[] args) {
-        Buffer buffer = new Buffer(M);
-        Producer[] producers = new Producer[PRODUCER_COUNT];
-        Consumer[] consumers = new Consumer[CONSUMER_COUNT];
+        Buffer buffer = FAIR ? new FairBuffer(M, PRODUCER_COUNT, CONSUMER_COUNT) : new UnfairBuffer(M);
+        Processor[] producers = new Processor[PRODUCER_COUNT];
+        Processor[] consumers = new Processor[CONSUMER_COUNT];
         for (int i = 0; i < PRODUCER_COUNT; i++) {
-            producers[i] = new Producer(i+1, buffer, M);
+            producers[i] = new Processor(Type.PRODUCER, i, buffer, M, MIN_WAIT, MAX_WAIT);
         }
         for (int i = 0; i < CONSUMER_COUNT; i++) {
-            consumers[i] = new Consumer(i+1, buffer, M);
+            consumers[i] = new Processor(Type.CONSUMER, i, buffer, M, MIN_WAIT, MAX_WAIT);
         }
-        for (int i = 0; i < PRODUCER_COUNT; i++) {
-            producers[i].start();
+        for (Processor producer : producers) {
+            producer.start();
         }
-        for (int i = 0; i < CONSUMER_COUNT; i++) {
-            consumers[i].start();
+        for (Processor consumer : consumers) {
+            consumer.start();
         }
     }
 }
