@@ -6,10 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d7c9df-25d5-49db-953b-53703b091c5d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/labs/lab4/zad2/Buffer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/labs/lab4/zad2/UnfairBuffer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/labs/lab4/zad2/Consumer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/labs/lab4/zad2/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/labs/lab4/zad2/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/labs/lab4/zad2/Producer.java" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -42,9 +38,10 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="module-info" />
-        <option value="Class" />
-        <option value="Enum" />
         <option value="Interface" />
+        <option value="Class" />
+        <option value="Record" />
+        <option value="Enum" />
       </list>
     </option>
   </component>
@@ -82,6 +79,7 @@
     "Gradle.tw [:labs.lab4.zad1.Main.main()].executor": "Run",
     "Gradle.tw [:labs.lab4.zad2.Main.main()].executor": "Run",
     "Gradle.tw [:labs.lab4.zad2.Tester.main()].executor": "Run",
+    "Gradle.tw [:labs.lab5.Mandelbrot.main()].executor": "Run",
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
@@ -107,7 +105,7 @@
       <recent name="labs.lab1" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.Tester">
+  <component name="RunManager" selected="Application.Mandelbrot">
     <configuration name="Main" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="labs.lab4.zad1.Main" />
       <module name="tw.main" />
@@ -121,12 +119,12 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="PrinterMain" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
-      <option name="MAIN_CLASS_NAME" value="labs.lab3.PrinterMain" />
+    <configuration name="Mandelbrot" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="labs.lab5.Mandelbrot" />
       <module name="tw.main" />
       <extension name="coverage">
         <pattern>
-          <option name="PATTERN" value="labs.lab3.*" />
+          <option name="PATTERN" value="labs.lab5.*" />
           <option name="ENABLED" value="true" />
         </pattern>
       </extension>
@@ -175,11 +173,11 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.Mandelbrot" />
         <item itemvalue="Application.Tester" />
         <item itemvalue="Application.labs.lab4.zad2.Main" />
         <item itemvalue="Application.Main" />
         <item itemvalue="Application.WaiterMain" />
-        <item itemvalue="Application.PrinterMain" />
       </list>
     </recent_temporary>
   </component>
@@ -211,6 +209,8 @@
       <workItem from="1762368445241" duration="7000" />
       <workItem from="1762368556600" duration="50000" />
       <workItem from="1762772099091" duration="10937000" />
+      <workItem from="1762793043839" duration="637000" />
+      <workItem from="1762937730902" duration="6063000" />
     </task>
     <servers />
   </component>
