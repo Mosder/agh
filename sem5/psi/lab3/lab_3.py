@@ -501,7 +501,7 @@ categorical_X_valid = X_valid.loc[:, ~X_valid.columns.isin(continuous_cols)]
 continuous_X_test = X_test[continuous_cols]
 categorical_X_test = X_test.loc[:, ~X_test.columns.isin(continuous_cols)]
 
-categorical_encoder = OneHotEncoder(sparse=False, handle_unknown='ignore')
+categorical_encoder = OneHotEncoder(sparse_output=False, handle_unknown='ignore')
 continuous_scaler = StandardScaler() #MinMaxScaler(feature_range=(-1, 1))
 
 categorical_encoder.fit(categorical_X_train)
@@ -565,14 +565,29 @@ plt.show()
 
 # %% colab={"base_uri": "https://localhost:8080/"} id="NbABKz5-LAs2" outputId="086dc0f3-0184-4072-9fd3-275b60dee2e4" tags=["ex"]
 learning_rate = 1e-3
+epoch_count = 3000
 
-model = ...
-activation = ...
-optimizer = ...
-loss_fn = ...
+model = nn.Linear(X_train.shape[1], 1)
+activation = nn.Sigmoid()
+optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+loss_fn = nn.BCELoss()
 
-# implement me!
-# your_code
+# training loop in each epoch
+for i in range(epoch_count):
+    # loss calculation
+    loss = loss_fn(activation(model(X_train)), y_train)
+
+    # backpropagation
+    loss.backward()
+
+    # optimization
+    optimizer.step()
+    optimizer.zero_grad()  # zeroes all gradients - very convenient!
+
+    if i % 100 == 0:
+        print(f"step {i} loss: {loss.item():.4f}")
+
+print(f"final loss: {loss.item():.4f}")
 
 
 # %% [markdown] tags=["ex"]
@@ -750,17 +765,19 @@ plot_precision_recall_curve(y_valid, y_pred_valid_score)
 # %% tags=["ex"]
 from torch import sigmoid
 
-
 class MLP(nn.Module):
     def __init__(self, input_size: int):
         super().__init__()
-
-        # implement me!
-        # your_code
+        self.linear_relu_stack = nn.Sequential(
+            nn.Linear(input_size, 256),
+            nn.ReLU(),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Linear(128, 1),
+        )
 
     def forward(self, x):
-        # implement me!
-        # your_code
+        return self.linear_relu_stack(x)
 
     def predict_proba(self, x):
         return sigmoid(self(x))
@@ -870,9 +887,27 @@ def evaluate_model(
     loss_fn: nn.Module,
     threshold: Optional[float] = None
 ) -> Dict[str, float]:
-    # implement me!
-    # your_code
+    model.eval()
+    with torch.no_grad():
+        y_pred = model(X)
+        y_pred_score = model.predict_proba(X)
 
+    precisions, recalls, thresholds = precision_recall_curve(y, y_pred)
+
+    if threshold:
+        idx = np.argmin(np.abs(thresholds - threshold))
+    else:
+        idx, threshold = get_optimal_threshold(precisions, recalls, thresholds)
+    
+    result = {}
+    result["loss"] = loss_fn(y_pred, y).item()
+    result["AUROC"] = roc_auc_score(y, y_pred_score)
+    result["threshold"] = threshold
+    result["F1-score"] = 2 * precisions[idx] * recalls[idx] / (precisions[idx] + recalls[idx])
+    result["precision"] = precisions[idx]
+    result["recall"] = recalls[idx]
+
+    return result
 
 
 # %% tags=["ex"]
@@ -896,13 +931,18 @@ print("Solution is correct!")
 class RegularizedMLP(nn.Module):
     def __init__(self, input_size: int, dropout_p: float = 0.5):
         super().__init__()
-
-        # implement me!
-        # your_code
+        self.dropout_stack = nn.Sequential(
+            nn.Linear(input_size, 256),
+            nn.ReLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(256, 128),
+            nn.ReLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(128, 1),
+        )
     
     def forward(self, x):
-        # implement me!
-        # your_code
+        return self.dropout_stack(x)
 
     def predict_proba(self, x):
         return sigmoid(self(x))
@@ -1025,12 +1065,23 @@ for epoch_num in range(max_epochs):
     # note that we are using DataLoader to get batches
     for X_batch, y_batch in train_dataloader:
         # model training
-        # implement me!
-        # your_code
+        y_batch_pred = model(X_batch)
+        loss = loss_fn(y_batch_pred, y_batch)
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
     
     # model evaluation, early stopping
-    # implement me!
-    # your_code
+    valid_metrics = evaluate_model(model, X_valid, y_valid, loss_fn)
+    if valid_metrics['loss'] < best_val_loss:
+        best_val_loss = valid_metrics['loss']
+        best_model = model
+        best_threshold = valid_metrics['threshold']
+        steps_without_improvement = 0
+    else:
+        steps_without_improvement += 1
+        if steps_without_improvement >= early_stopping_patience:
+            break
     
     print(f"Epoch {epoch_num} train loss: {loss.item():.4f}, eval loss {valid_metrics['loss']}")
 
@@ -1078,9 +1129,17 @@ print("Solution is correct!")
 class NormalizingMLP(nn.Module):
     def __init__(self, input_size: int, dropout_p: float = 0.5):
         super().__init__()
-
-        # implement me!
-        # your_code
+        self.mlp = nn.Sequential(
+            nn.Linear(input_size, 256),
+            nn.BatchNorm1d(256),
+            nn.ReLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(256, 128),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(128, 1),
+        )
     
     def forward(self, x):
         return self.mlp(x)
@@ -1093,20 +1152,70 @@ class NormalizingMLP(nn.Module):
         return (y_pred_score > threshold).to(torch.int32)
 
 
-
 # %% tags=["ex"]
 # define all the hyperparameters
-# your_code
+learning_rate = 1e-3
+dropout_p = 0.5
+l2_reg = 1e-4
+batch_size = 128
+max_epochs = 300
+early_stopping_patience = 4
 
 
 # %% tags=["ex"]
+from sklearn.utils.class_weight import compute_class_weight
+
 # training loop
-# your_code
+model = NormalizingMLP(
+    input_size=X_train.shape[1], 
+    dropout_p=dropout_p
+)
+optimizer = torch.optim.AdamW(
+    model.parameters(), 
+    lr=learning_rate, 
+    weight_decay=l2_reg
+)
+weights = compute_class_weight(class_weight="balanced", classes=np.unique(y), y=y)
+loss_fn = torch.nn.BCEWithLogitsLoss(pos_weight=torch.from_numpy(weights)[1])
 
+train_dataset = MyDataset(X_train, y_train)
+train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
 
+steps_without_improvement = 0
+
+best_val_loss = np.inf
+best_model = None
+best_threshold = None
+
+for epoch_num in range(max_epochs):
+    model.train()
+    
+    # note that we are using DataLoader to get batches
+    for X_batch, y_batch in train_dataloader:
+        # model training
+        y_batch_pred = model(X_batch)
+        loss = loss_fn(y_batch_pred, y_batch)
+        loss.backward()
+        optimizer.step()
+        optimizer.zero_grad()
+    
+    # model evaluation, early stopping
+    valid_metrics = evaluate_model(model, X_valid, y_valid, loss_fn)
+    if valid_metrics['loss'] < best_val_loss:
+        best_val_loss = valid_metrics['loss']
+        best_model = model
+        best_threshold = valid_metrics['threshold']
+        steps_without_improvement = 0
+    else:
+        steps_without_improvement += 1
+        if steps_without_improvement >= early_stopping_patience:
+            break
+    
+    print(f"Epoch {epoch_num} train loss: {loss.item():.4f}, eval loss {valid_metrics['loss']}")
 
 # %% tags=["ex"]
 test_metrics = evaluate_model(best_model, X_test, y_test, loss_fn, best_threshold)
+no_study_metrics = test_metrics
 
 print(f"AUROC: {test_metrics['AUROC']:.2%}")
 print(f"F1: {test_metrics['F1-score']:.2%}")
@@ -1227,6 +1336,7 @@ print(f"AUROC: {test_res['AUROC']:.2%}")
 print(f"F1: {test_res['F1-score']:.2%}")
 print(test_res)
 
+
 # %% [markdown]
 # Co prawda ten model nie będzie tak dobry jak ten z laboratorium, ale zwróć uwagę, o ile jest większy, a przy tym szybszy.
 #
@@ -1258,3 +1368,129 @@ print(test_res)
 # - [Using Optuna to Optimize PyTorch Hyperparameters](https://medium.com/pytorch/using-optuna-to-optimize-pytorch-hyperparameters-990607385e36)
 
 # %% tags=["ex"]
+class AdditionalMLP(nn.Module):
+    def __init__(self, input_size: int, N: int, dropout_p: float = 0.5):
+        super().__init__()
+        self.mlp = nn.Sequential(
+            nn.Linear(input_size, N),
+            nn.BatchNorm1d(N),
+            nn.ReLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(N, N//2),
+            nn.BatchNorm1d(N//2),
+            nn.ReLU(),
+            nn.Dropout(dropout_p),
+            nn.Linear(N//2, 1),
+        )
+    
+    def forward(self, x):
+        return self.mlp(x)
+
+    def predict_proba(self, x):
+        return sigmoid(self(x))
+    
+    def predict(self, x, threshold: float = 0.5):
+        y_pred_score = self.predict_proba(x)
+        return (y_pred_score > threshold).to(torch.int32)
+
+
+# %%
+max_epochs = 300
+early_stopping_patience = 10
+
+
+# %%
+def objective(trial):
+    N = trial.suggest_int('N', 64, 512)
+    learning_rate = trial.suggest_float('learning_rate', 1e-4, 1e-2)
+    batch_size = trial.suggest_int('batch_size', 32, 256)
+    l2_reg = trial.suggest_float('l2_reg', 1e-5, 1e-3)
+    dropout_p = trial.suggest_float('dropout_p', 0.3, 0.7)
+    
+    model = AdditionalMLP(
+        input_size=X_train.shape[1],
+        N=N,
+        dropout_p=dropout_p
+    ).to('cuda')
+    optimizer = torch.optim.AdamW(
+        model.parameters(), 
+        lr=learning_rate, 
+        weight_decay=l2_reg
+    )
+    weights = compute_class_weight(class_weight="balanced", classes=np.unique(y), y=y)
+    loss_fn = torch.nn.BCEWithLogitsLoss(pos_weight=torch.from_numpy(weights)[1].to('cuda'))
+    
+    train_dataset = MyDataset(X_train, y_train)
+    train_dataloader = DataLoader(train_dataset, batch_size=batch_size)
+    
+    steps_without_improvement = 0
+    
+    best_val_loss = np.inf
+    best_model = None
+    best_threshold = None
+    
+    for epoch_num in range(max_epochs):
+        model.train().to('cuda')
+        
+        # note that we are using DataLoader to get batches
+        for X_batch, y_batch in train_dataloader:
+            X_batch = X_batch.to('cuda')
+            y_batch = y_batch.to('cuda')
+            # model training
+            y_batch_pred = model(X_batch)
+            loss = loss_fn(y_batch_pred, y_batch)
+            loss.backward()
+            optimizer.step()
+            optimizer.zero_grad()
+        
+        # model evaluation, early stopping
+        valid_metrics = evaluate_model(model.to('cpu'), X_valid, y_valid, loss_fn.to('cpu'))
+        if valid_metrics['loss'] < best_val_loss:
+            best_val_loss = valid_metrics['loss']
+            best_model = model
+            best_threshold = valid_metrics['threshold']
+            steps_without_improvement = 0
+        else:
+            steps_without_improvement += 1
+            if steps_without_improvement >= early_stopping_patience:
+                break
+
+    test_metrics = evaluate_model(best_model.to('cpu'), X_test, y_test, loss_fn.to('cpu'), best_threshold)
+    trial.set_user_attr("metrics", test_metrics)
+    return best_val_loss
+
+
+# %%
+import optuna
+from optuna.samplers import RandomSampler
+from time import time
+
+ITERS = 30
+
+t0 = time()
+study = optuna.create_study(direction='minimize')
+study.optimize(objective, n_trials=ITERS)
+study_time = time() - t0
+
+t0 = time()
+study_random = optuna.create_study(direction='minimize', sampler=RandomSampler())
+study_random.optimize(objective, n_trials=ITERS)
+study_random_time = time() - t0
+
+
+# %%
+print(f"Study time: {study_time:.4f}s")
+print(f"Random study time: {study_random_time:.4f}s")
+
+metricss = [
+    ("no study", no_study_metrics),
+    ("study\t", study.best_trial.user_attrs["metrics"]),
+    ("random study", study_random.best_trial.user_attrs["metrics"]),
+]
+print("Comparison:")
+print("\t\tLoss\tAUROC\tF1\tPrec.\tRecall")
+for name, metrics in metricss:
+    print(f"{name}\t{metrics['loss']:.4f}\t{metrics['AUROC']:.4f}\t{metrics['F1-score']:.4f}\t{metrics['precision']:.4f}\t{metrics['recall']:.4f}")
+
+# %% [markdown]
+# Wyniki przy optymalizacji hiperparametrów okazały się bardzo podobne, i nawet gorsze, od wyników używających hiperparametrów zdefiniowanych w laboratorium. Zapewne dla lepiej zdefiniowanych przedziałów, z których można wybierać hiperparametry oraz większej liczy iteracji wyniki mogłyby polepszyć wynik. Jeśli udało by się poprawić metryki to zapewne było by to warte poświęconego czasu, gdyż na laptopie zajęło to jedynie niecałe 3 minuty, więc na lepszym sprzęcie czas poświęcony na to byłby znikomy.
