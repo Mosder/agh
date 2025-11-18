@@ -14,7 +14,7 @@ public class Mandelbrot extends JFrame {
     public final static int MONITOR_HEIGHT = 1080;
     public final static int WINDOW_WIDTH = 800;
     public final static int WINDOW_HEIGHT = 600;
-    public final static int MAX_ITER = 100_000;
+    public final static int MAX_ITER = 570;
     public final static double ZOOM = 150;
     private final static int CORE_COUNT = 6;
     private static BufferedImage image;
@@ -76,19 +76,24 @@ public class Mandelbrot extends JFrame {
 
     public static void main(String[] args) throws ExecutionException, InterruptedException {
         // first run takes longer for some reason, so run one additional
-        int testCount = 11;
-        int[] threadCounts = {1, CORE_COUNT, 4*CORE_COUNT};
-        TaskCount[] taskCounts = {TaskCount.THREADS, TaskCount.THREADS_X10, TaskCount.EVERY_PIXEL};
-        try (FileWriter fw = new FileWriter(FILE_PATH)) {
-            for (int threadCount : threadCounts) {
-                for (TaskCount taskCount : taskCounts) {
-                    for (int i = 0; i < testCount; i++) {
-                        new Mandelbrot(threadCount, taskCount, false, fw);
-                    }
-                }
-            }
-        }
-        catch (IOException e) {
+//        int testCount = 11;
+//        int[] threadCounts = {1, CORE_COUNT, 4*CORE_COUNT};
+//        TaskCount[] taskCounts = {TaskCount.THREADS, TaskCount.THREADS_X10, TaskCount.EVERY_PIXEL};
+//        try (FileWriter fw = new FileWriter(FILE_PATH)) {
+//            for (int threadCount : threadCounts) {
+//                for (TaskCount taskCount : taskCounts) {
+//                    for (int i = 0; i < testCount; i++) {
+//                        new Mandelbrot(threadCount, taskCount, false, fw);
+//                    }
+//                }
+//            }
+//        }
+//        catch (IOException e) {
+//            System.err.println("Error: " + e.getMessage());
+//        }
+        try {
+            new Mandelbrot(12, TaskCount.THREADS_X10, true, null).setVisible(true);
+        } catch (IOException e) {
             System.err.println("Error: " + e.getMessage());
         }
     }

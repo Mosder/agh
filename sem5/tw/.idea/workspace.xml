@@ -4,7 +4,10 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d6d7c9df-25d5-49db-953b-53703b091c5d" name="Changes" comment="" />
+    <list default="true" id="d6d7c9df-25d5-49db-953b-53703b091c5d" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/labs/lab5/Mandelbrot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/labs/lab5/Mandelbrot.java" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -210,6 +213,7 @@
       <workItem from="1762793043839" duration="637000" />
       <workItem from="1762937730902" duration="6063000" />
       <workItem from="1763241380388" duration="6951000" />
+      <workItem from="1763456455632" duration="2537000" />
     </task>
     <servers />
   </component>
