@@ -236,6 +236,7 @@ class LeNet(nn.Module):
             nn.Conv2d(20, 50, (5,5)),
             nn.ReLU(),
             nn.AvgPool2d((2,2), 2),
+            nn.Flatten(),
             nn.Linear(50*4*4, 300),
             nn.ReLU(),
             nn.Linear(300, 100),
@@ -275,8 +276,12 @@ optimizer = optim.SGD(net.parameters(), lr=0.001, momentum=0.9)
 net.train()
 
 for epoch in range(5):
-    for x in trainloader:
-        print(x)
+    for images, labels in trainloader:
+        loss = criterion(net(images.to(device)), labels.to(device))
+        loss.backward()
+    
+        optimizer.step()
+        optimizer.zero_grad()
 
 
 # %% [markdown]
@@ -318,7 +323,7 @@ print(f"Accuracy of the network on the 10000 test images: {100 * correct // tota
 # Skomentuj wyniki:
 
 # %% [markdown] id="RnshMzgRGwwi" pycharm={"name": "#%% md\n"} tags=["ex"]
-# *   
+# Sieć jest w stanie rozpoznawać ubrania po ich kształcie, lecz ma problemy z rozróżnianiem ubrań w tej samej kategorii (np. dress i top). Ma też problem z rozpoznaniem pomiędzy kategoriami jeśli są podobnych kształtów (np. Shirt i Bag wyżej). Jednakże 81% nie jest złym wynikiem dla bazowej sieci neuronowej.
 
 # %% [markdown]
 # Znając ogólny wynik klasyfikacji dla zbioru przeanalizujmy dokładniej, z którymi klasami jest największy problem.
@@ -331,16 +336,39 @@ print(f"Accuracy of the network on the 10000 test images: {100 * correct // tota
 # %% colab={"base_uri": "https://localhost:8080/"} id="8M0L-jE6JcnS" outputId="a4ad3c40-aa5f-4eec-bf70-e160c50210ca" pycharm={"name": "#%%\n"} tags=["ex"]
 net.eval()
 
-# print(f"Accuracy for class: {classname:5s} is {accuracy:.1f} %")
+class PredResult:
+    def __init__(self):
+        self.correct = 0
+        self.total = 0
 
-# your_code
+    def accuracy(self):
+        return self.correct / self.total
+
+results_set = {}
+for c in classes:
+    results_set[c] = PredResult()
+
+with torch.no_grad():
+    for images, labels in testloader:
+        images = images.to(device)
+        labels = labels.to(device)
+        predictions = torch.argmax(net(images).data, 1)
+        for pred, label in zip(predictions, labels):
+            c = classes[label.item()]
+            results_set[c].total += 1
+            if pred.item() == label.item():
+                results_set[c].correct += 1
+
+print("Accuracy per class:")
+for c, res in results_set.items():
+    print(f"{c:<10} - {res.accuracy():.4f}")
 
 
 # %% [markdown] id="Zj-9mF99GsgA" pycharm={"name": "#%% md\n"}
 # Skomentuj wyniki:
 
 # %% [markdown] id="0JC1etcwGuIv" pycharm={"name": "#%% md\n"} tags=["ex"]
-# *   
+# Zgodnie z przewidywaniami najgorszej sklasyfikowane klasy są klasy o podobnych kształtach, tj. Shirt i Pullover. Klasy o większych różnicach w kształtach (np. Trouser) mają dużo lepszą klasyfikację.
 
 # %% [markdown] id="WdIUXK0Y6SkD" pycharm={"name": "#%% md\n"}
 # ## Detekcja obiektów
@@ -488,9 +516,12 @@ model.eval()
 #
 # Do pobierania obrazów możemy się posłyżyć wget-em.
 
+# %% [markdown]
+# <b style="color:red">Czemu ten wget ciągle? Nie ma powodu, dla którego to by nie miałby być zwykły curl. Jeśli to było by coś rekurencyjnego do pobrania to jeszcze spoko, ale za każdym razem w tych notebookach to był tylko jeden plik. Użycie curl'a jest w takim przypadku dużo lepsze, gdyż jest core packagem praktycznie wszędzie, a wget jest rzadziej. Zatem lepiej jest użyć package'a, którego będzie posiadało więcej użytkowników skoro funkcjonalnie nie ma różnicy w tym przypadku, nieprawdaż?</b>
+
 # %% colab={"base_uri": "https://localhost:8080/"} id="E8jos4Ipl1DZ" outputId="79f6a265-879c-450e-b552-0ea1c4189e55" pycharm={"name": "#%%\n"}
 # Pobieranie obrazka z sieci
-# !wget https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Toothbrush_x3_20050716_001.jpg/1280px-Toothbrush_x3_20050716_001.jpg --output-document toothbrushes.jpg
+# # !curl https://upload.wikimedia.org/wikipedia/commons/thumb/7/7a/Toothbrush_x3_20050716_001.jpg/1280px-Toothbrush_x3_20050716_001.jpg > toothbrushes.jpg
 
 # %% colab={"base_uri": "https://localhost:8080/", "height": 967} id="zGNGMSYyl1Da" outputId="de889f01-4bcf-46c3-97c8-eed20582c83c" pycharm={"name": "#%%\n"}
 # Wyświetlanie obrazka
@@ -522,7 +553,42 @@ image_tensor.shape, image_tensor.dtype
 # - [PyTorch - Torchvision](https://pytorch.org/vision/stable/auto_examples/others/plot_visualization_utils.html#visualizing-bounding-boxes)
 
 # %% colab={"base_uri": "https://localhost:8080/", "height": 1000} id="KLxhLQGHLkqr" outputId="7af9d545-6eb8-42c8-f88c-21a892219cfc" pycharm={"name": "#%%\n"} tags=["ex"]
-# your_code
+from matplotlib.patches import Rectangle
+
+threshold = 0.5
+
+results = model([image_tensor.to(device)])[0]
+boxes = results['boxes'][results['scores'] > threshold]
+scores = results['scores'][results['scores'] > threshold]
+labels = results['labels'][results['scores'] > threshold]
+
+class BoxResult:
+    def __init__(self, box, score, label):
+        self.box = box
+        self.score = score
+        self.label = classes[label]
+
+    def classify_text(self):
+        return f"{self.label} ({100*self.score:.2f}%)"
+
+    def print(self):
+        print(f"{self.classify_text()}: {self.box}")
+
+box_results = list()
+for box, score, label in zip(boxes, scores, labels):
+    box_results.append(BoxResult(box.numpy(force=True), score.item(), label.item()))
+
+for res in box_results:
+    res.print()
+
+plt.figure(figsize = (12,8))
+for res in box_results:
+    plt.text(res.box[0], res.box[1], res.classify_text(), fontsize=9, color='white', backgroundcolor='black')
+    rect = Rectangle((res.box[0], res.box[1]), res.box[2]-res.box[0], res.box[3]-res.box[1], edgecolor='red', fill=False, lw=2)
+    plt.gca().add_patch(rect)
+plt.imshow(image)
+plt.axis("off")
+plt.show()
 
 
 # %% [markdown] id="Ht_9Aq1D3sIR" pycharm={"name": "#%% md\n"}
@@ -536,8 +602,8 @@ image_tensor.shape, image_tensor.dtype
 
 # %% colab={"base_uri": "https://localhost:8080/"} id="8aOp1d6zcrln" outputId="3bcc034c-2484-492c-8638-8e9cffe26b77" pycharm={"name": "#%%\n"}
 # Download the hotdog dataset
-# !wget http://d2l-data.s3-accelerate.amazonaws.com/hotdog.zip
-# !unzip -n hotdog.zip
+# # !curl http://d2l-data.s3-accelerate.amazonaws.com/hotdog.zip > hotdog.zip
+# # !unzip -n hotdog.zip
 
 # %% [markdown] id="feE-mTJ3l1Df" pycharm={"name": "#%% md\n"}
 # Kiedy korzystamy z sieci pretrenowanej na zbiorze ImageNet, zgodnie [z dokumentacją](https://pytorch.org/vision/0.8/models.html) trzeba dokonać standaryzacji naszych obrazów, odejmując średnią i dzieląc przez odchylenie standardowe każdego kanału ze zbioru ImageNet.
@@ -590,8 +656,8 @@ pretrained_net.fc
 # Zastąp wyjściową warstwę liniową naszej fine-fune'owanej sieci nową warstwą o odpowiedniej liczbie wyjść i zainicjuj ją losowymi wartościami.
 
 # %% id="DA77dAU2-MjX" pycharm={"name": "#%%\n"} tags=["ex"]
-finetuned_net = ... # your code here
-# your_code
+finetuned_net = pretrained_net
+finetuned_net.fc = nn.Linear(pretrained_net.fc.in_features, 2)
 
 
 # %% tags=["ex"]
@@ -720,8 +786,17 @@ loss = nn.CrossEntropyLoss(reduction="none")
 
 # %% id="E3erwcv3-YSj" pycharm={"name": "#%%\n"} tags=["ex"]
 def train_fine_tuning(net, learning_rate, num_epochs=15):
-
-    trainer = torch.optim.SGD(...) # your code here
+    last_names = ["fc.weight", "fc.bias"]
+    lower_params = [p[1] for p in net.named_parameters() if p[0] not in last_names]
+    last_params = [p[1] for p in net.named_parameters() if p[0] in last_names]
+    trainer = torch.optim.SGD(
+        [
+            {"params": lower_params},
+            {"params": last_params, "lr": 10*learning_rate}
+        ], 
+        lr=learning_rate, 
+        momentum=0.9
+    )
     
     dataloaders_dict = {"train": train_iter, "val": test_iter}
     criterion = nn.CrossEntropyLoss()
@@ -731,9 +806,6 @@ def train_fine_tuning(net, learning_rate, num_epochs=15):
     return model_ft, hist
 
 
-# your_code
-
-
 # %% colab={"base_uri": "https://localhost:8080/"} id="wdN1ptGLdHXe" outputId="91949bce-6d47-40f4-8df3-94316ad9d039" pycharm={"name": "#%%\n"}
 model_ft, hist = train_fine_tuning(model_ft, learning_rate=5e-5)
 
@@ -741,8 +813,11 @@ model_ft, hist = train_fine_tuning(model_ft, learning_rate=5e-5)
 # %% [markdown] id="eGQd_JUWG5l7" pycharm={"name": "#%% md\n"}
 # skomentuj wyniki:
 
+# %% [markdown]
+# Wyniki dla pretrenowanej sieci już na poczatku były dobre - ciekawe jest to, że zbiór walidacyjny już w pierwszej epoce osiągnął 89% dokładności, gdy zbiór treningowy osiągnął jedynie 71%. Wykonanie treningu sieci przez 15 epok pozwoiło osiągnąć bardzo dobry wynik równy 94,75% na zbiorze walidacyjnym.
+
 # %% [markdown] id="gfT3PYVyG7v8" pycharm={"name": "#%% md\n"} tags=["ex"]
-# *   
+#
 
 # %% [markdown] id="RAW-qztkl1Dk" pycharm={"name": "#%% md\n"}
 # Przy wyświetlaniu predykcji sieci musimy wykonać operacje odwrotne niż te, które wykonaliśmy, przygotowując obrazy do treningu:
@@ -803,5 +878,3 @@ visualize_model(model_ft)
 # ## Zadanie dodatkowe (3 punkty)
 #
 # W zadaniach dotyczących klasyfikacji obrazu wykorzystywaliśmy prosty zbiór danych i sieć LeNet. Teraz zamień zbiór danych na bardziej skomplikowany, przykładowo [klasyfikację gatunków ptaków](http://www.vision.caltech.edu/datasets/cub_200_2011/) lub [analizę zdjęć rentgenowskich płuc](https://www.kaggle.com/datasets/paultimothymooney/chest-xray-pneumonia). Zastosuj finetuning współczesnej, pretrenowanej sieci neuronowej, np. ResNet34 (lub głębszej), ConvNeXt, MobileNetV3.
-
-# %% id="2AU9M-yCl1Dv" pycharm={"name": "#%%\n"} tags=["ex"]
