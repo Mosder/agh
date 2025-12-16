@@ -1,0 +1,293 @@
+<?xml version="1.0" encoding="ISO-8859-1"?><pnml>
+    <net id="Net-One" type="P/T net">
+        <token id="Default" enabled="true" red="0" green="0" blue="0"/>
+        <place id="nadchodzi termin poprawkowy">
+            <graphics>
+                <position x="375.0" y="415.0"/>
+            </graphics>
+            <name>
+                <value>nadchodzi termin poprawkowy</value>
+                <graphics>
+                    <offset x="0.0" y="0.0"/>
+                </graphics>
+            </name>
+            <initialMarking>
+                <value>Default,0</value>
+                <graphics>
+                    <offset x="0.0" y="0.0"/>
+                </graphics>
+            </initialMarking>
+            <capacity>
+                <value>0</value>
+            </capacity>
+        </place>
+        <place id="student dostaje 2.0 z egzaminu, bo pi&#322; zamiast si&#281; uczy&#263;">
+            <graphics>
+                <position x="675.0" y="175.0"/>
+            </graphics>
+            <name>
+                <value>student dostaje 2.0 z egzaminu, bo pi&#322; zamiast si&#281; uczy&#263;</value>
+                <graphics>
+                    <offset x="0.0" y="0.0"/>
+                </graphics>
+            </name>
+            <initialMarking>
+                <value>Default,0</value>
+                <graphics>
+                    <offset x="0.0" y="0.0"/>
+                </graphics>
+            </initialMarking>
+            <capacity>
+                <value>0</value>
+            </capacity>
+        </place>
+        <place id="student pisze egzamin">
+            <graphics>
+                <position x="360.0" y="205.0"/>
+            </graphics>
+            <name>
+                <value>student pisze egzamin</value>
+                <graphics>
+                    <offset x="0.0" y="0.0"/>
+                </graphics>
+            </name>
+            <initialMarking>
+                <value>Default,1</value>
+                <graphics>
+                    <offset x="0.0" y="0.0"/>
+                </graphics>
+            </initialMarking>
+            <capacity>
+                <value>0</value>
+            </capacity>
+        </place>
+        <place id="student zalewa smutki">
+            <graphics>
+                <position x="705.0" y="385.0"/>
+            </graphics>
+            <name>
+                <value>student zalewa smutki</value>
+                <graphics>
+                    <offset x="0.0" y="0.0"/>
+                </graphics>
+            </name>
+            <initialMarking>
+                <value>Default,0</value>
+                <graphics>
+                    <offset x="0.0" y="0.0"/>
+                </graphics>
+            </initialMarking>
+            <capacity>
+                <value>0</value>
+            </capacity>
+        </place>
+        <transition id="T0">
+            <graphics>
+                <position x="450.0" y="310.0"/>
+            </graphics>
+            <name>
+                <value>T0</value>
+                <graphics>
+                    <offset x="-5.0" y="35.0"/>
+                </graphics>
+            </name>
+            <orientation>
+                <value>0</value>
+            </orientation>
+            <rate>
+                <value>1.0</value>
+            </rate>
+            <timed>
+                <value>false</value>
+            </timed>
+            <infiniteServer>
+                <value>false</value>
+            </infiniteServer>
+            <priority>
+                <value>1</value>
+            </priority>
+        </transition>
+        <transition id="T1">
+            <graphics>
+                <position x="495.0" y="205.0"/>
+            </graphics>
+            <name>
+                <value>T1</value>
+                <graphics>
+                    <offset x="-5.0" y="35.0"/>
+                </graphics>
+            </name>
+            <orientation>
+                <value>0</value>
+            </orientation>
+            <rate>
+                <value>1.0</value>
+            </rate>
+            <timed>
+                <value>false</value>
+            </timed>
+            <infiniteServer>
+                <value>false</value>
+            </infiniteServer>
+            <priority>
+                <value>1</value>
+            </priority>
+        </transition>
+        <transition id="T2">
+            <graphics>
+                <position x="670.0" y="280.0"/>
+            </graphics>
+            <name>
+                <value>T2</value>
+                <graphics>
+                    <offset x="-5.0" y="35.0"/>
+                </graphics>
+            </name>
+            <orientation>
+                <value>0</value>
+            </orientation>
+            <rate>
+                <value>1.0</value>
+            </rate>
+            <timed>
+                <value>false</value>
+            </timed>
+            <infiniteServer>
+                <value>false</value>
+            </infiniteServer>
+            <priority>
+                <value>1</value>
+            </priority>
+        </transition>
+        <transition id="T3">
+            <graphics>
+                <position x="525.0" y="415.0"/>
+            </graphics>
+            <name>
+                <value>T3</value>
+                <graphics>
+                    <offset x="-5.0" y="35.0"/>
+                </graphics>
+            </name>
+            <orientation>
+                <value>0</value>
+            </orientation>
+            <rate>
+                <value>1.0</value>
+            </rate>
+            <timed>
+                <value>false</value>
+            </timed>
+            <infiniteServer>
+                <value>false</value>
+            </infiniteServer>
+            <priority>
+                <value>1</value>
+            </priority>
+        </transition>
+        <arc id="nadchodzi termin poprawkowy to T0" source="nadchodzi termin poprawkowy" target="T0">
+            <graphics/>
+            <inscription>
+                <value>Default,1</value>
+                <graphics/>
+            </inscription>
+            <tagged>
+                <value>false</value>
+            </tagged>
+            <arcpath id="000" x="395" y="414" curvePoint="false"/>
+            <arcpath id="001" x="456" y="327" curvePoint="false"/>
+            <type value="normal"/>
+        </arc>
+        <arc id="student dostaje 2.0 z egzaminu, bo pi&#322; zamiast si&#281; uczy&#263; to T2" source="student dostaje 2.0 z egzaminu, bo pi&#322; zamiast si&#281; uczy&#263;" target="T2">
+            <graphics/>
+            <inscription>
+                <value>Default,1</value>
+                <graphics/>
+            </inscription>
+            <tagged>
+                <value>false</value>
+            </tagged>
+            <arcpath id="000" x="686" y="201" curvePoint="false"/>
+            <arcpath id="001" x="682" y="276" curvePoint="false"/>
+            <type value="normal"/>
+        </arc>
+        <arc id="student pisze egzamin to T1" source="student pisze egzamin" target="T1">
+            <graphics/>
+            <inscription>
+                <value>Default,1</value>
+                <graphics/>
+            </inscription>
+            <tagged>
+                <value>false</value>
+            </tagged>
+            <arcpath id="000" x="386" y="216" curvePoint="false"/>
+            <arcpath id="001" x="501" y="217" curvePoint="false"/>
+            <type value="normal"/>
+        </arc>
+        <arc id="student zalewa smutki to T3" source="student zalewa smutki" target="T3">
+            <graphics/>
+            <inscription>
+                <value>Default,1</value>
+                <graphics/>
+            </inscription>
+            <tagged>
+                <value>false</value>
+            </tagged>
+            <arcpath id="000" x="702" y="399" curvePoint="false"/>
+            <arcpath id="001" x="541" y="426" curvePoint="false"/>
+            <type value="normal"/>
+        </arc>
+        <arc id="T0 to student pisze egzamin" source="T0" target="student pisze egzamin">
+            <graphics/>
+            <inscription>
+                <value>Default,1</value>
+                <graphics/>
+            </inscription>
+            <tagged>
+                <value>false</value>
+            </tagged>
+            <arcpath id="000" x="456" y="317" curvePoint="false"/>
+            <arcpath id="001" x="381" y="228" curvePoint="false"/>
+            <type value="normal"/>
+        </arc>
+        <arc id="T1 to student dostaje 2.0 z egzaminu, bo pi&#322; zamiast si&#281; uczy&#263;" source="T1" target="student dostaje 2.0 z egzaminu, bo pi&#322; zamiast si&#281; uczy&#263;">
+            <graphics/>
+            <inscription>
+                <value>Default,1</value>
+                <graphics/>
+            </inscription>
+            <tagged>
+                <value>false</value>
+            </tagged>
+            <arcpath id="000" x="511" y="216" curvePoint="false"/>
+            <arcpath id="001" x="672" y="189" curvePoint="false"/>
+            <type value="normal"/>
+        </arc>
+        <arc id="T2 to student zalewa smutki" source="T2" target="student zalewa smutki">
+            <graphics/>
+            <inscription>
+                <value>Default,1</value>
+                <graphics/>
+            </inscription>
+            <tagged>
+                <value>false</value>
+            </tagged>
+            <arcpath id="000" x="682" y="306" curvePoint="false"/>
+            <arcpath id="001" x="711" y="382" curvePoint="false"/>
+            <type value="normal"/>
+        </arc>
+        <arc id="T3 to nadchodzi termin poprawkowy" source="T3" target="nadchodzi termin poprawkowy">
+            <graphics/>
+            <inscription>
+                <value>Default,1</value>
+                <graphics/>
+            </inscription>
+            <tagged>
+                <value>false</value>
+            </tagged>
+            <arcpath id="000" x="531" y="427" curvePoint="false"/>
+            <arcpath id="001" x="401" y="426" curvePoint="false"/>
+            <type value="normal"/>
+        </arc>
+    </net>
+</pnml>
