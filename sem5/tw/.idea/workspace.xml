@@ -6,7 +6,6 @@
   <component name="ChangeListManager">
     <list default="true" id="d6d7c9df-25d5-49db-953b-53703b091c5d" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/labs/lab5/Mandelbrot.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/labs/lab5/Mandelbrot.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -43,6 +42,7 @@
         <option value="Class" />
         <option value="Record" />
         <option value="Enum" />
+        <option value="Kotlin File" />
       </list>
     </option>
   </component>
@@ -61,44 +61,45 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;Application.Main.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.Build tw.executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab1.CounterMain.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab1.CounterSynchronized.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab1.CounterUnsynchronized.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab1.Main.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab1.ProducerConsumer.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab2.CounterSemaphore.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab2.PhilosophersAsymmetric.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab2.PhilosophersTrivial.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab2.PhilosophersWaiter.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab3.PrinterMain.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab3.WaiterMain.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab4.zad1.Main.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab4.zad2.Main.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab4.zad2.Tester.main()].executor&quot;: &quot;Run&quot;,
-    &quot;Gradle.tw [:labs.lab5.Mandelbrot.main()].executor&quot;: &quot;Run&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;master&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;onboarding.tips.debug.path&quot;: &quot;/home/mosder/agh/sem5/tw/src/main/java/org/example/Main.java&quot;,
-    &quot;project.structure.last.edited&quot;: &quot;Modules&quot;,
-    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
-    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "Application.Main.executor": "Run",
+    "Gradle.Build tw.executor": "Run",
+    "Gradle.tw [:labs.lab1.CounterMain.main()].executor": "Run",
+    "Gradle.tw [:labs.lab1.CounterSynchronized.main()].executor": "Run",
+    "Gradle.tw [:labs.lab1.CounterUnsynchronized.main()].executor": "Run",
+    "Gradle.tw [:labs.lab1.Main.main()].executor": "Run",
+    "Gradle.tw [:labs.lab1.ProducerConsumer.main()].executor": "Run",
+    "Gradle.tw [:labs.lab2.CounterSemaphore.main()].executor": "Run",
+    "Gradle.tw [:labs.lab2.PhilosophersAsymmetric.main()].executor": "Run",
+    "Gradle.tw [:labs.lab2.PhilosophersTrivial.main()].executor": "Run",
+    "Gradle.tw [:labs.lab2.PhilosophersWaiter.main()].executor": "Run",
+    "Gradle.tw [:labs.lab3.PrinterMain.main()].executor": "Run",
+    "Gradle.tw [:labs.lab3.WaiterMain.main()].executor": "Run",
+    "Gradle.tw [:labs.lab4.zad1.Main.main()].executor": "Run",
+    "Gradle.tw [:labs.lab4.zad2.Main.main()].executor": "Run",
+    "Gradle.tw [:labs.lab4.zad2.Tester.main()].executor": "Run",
+    "Gradle.tw [:labs.lab5.Mandelbrot.main()].executor": "Run",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "git-widget-placeholder": "master",
+    "kotlin-language-version-configured": "true",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "onboarding.tips.debug.path": "/home/mosder/agh/sem5/tw/src/main/java/org/example/Main.java",
+    "project.structure.last.edited": "Modules",
+    "project.structure.proportion": "0.15",
+    "project.structure.side.proportion": "0.2",
+    "settings.editor.selected.configurable": "preferences.pluginManager",
+    "vue.rearranger.settings.migration": "true"
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="labs.lab4.zad2" />
@@ -185,8 +186,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.26830.84" />
-        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-IU-252.26830.84" />
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.240" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.240" />
       </set>
     </attachedChunks>
   </component>
@@ -214,6 +215,7 @@
       <workItem from="1762937730902" duration="6063000" />
       <workItem from="1763241380388" duration="6951000" />
       <workItem from="1763456455632" duration="2537000" />
+      <workItem from="1768262954296" duration="469000" />
     </task>
     <servers />
   </component>
