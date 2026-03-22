@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>STEAM achievements info</title>
+</head>
+<body>
+	<h2>Get Steam achievements for a specified user</h2>
+	<form action="/achievements">
+		<label for="user_id">User's Steam64 ID or Vanity URL ID:</label>
+		<br>
+		<input type="text" id="user_id" name="user_id" placeholder="Mosder" required>
+		<br>
+		<label for="game_limit">Max number of games (taken from most played to least):</label>
+		<br>
+		<input type="number" id="game_limit" name="game_limit" placeholder="10" required>
+		<br>
+		<input type="submit" value="Submit">
+	</form>
+</body>
+</html>

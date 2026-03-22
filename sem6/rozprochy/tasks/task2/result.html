@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>STEAM achievements info</title>
+	<style>
+		table, th, td { border: 1px solid black; }
+		th, td { padding: 5px; }
+	</style>
+</head>
+<body>
+	<a href="/">Back to home page</a>
+	<h2>User:</h2>
+	<image src="{AVATAR_URL}"/>
+	<p>{USER_NAME} ({STEAM_ID})</p>
+	<p>Game count: {GAME_COUNT}</p>
+	<p>Total playtime: {PLAYTIME_SUM}</p>
+	<p>Total achievements completion: {ACHIEVEMENTS_SUM}</p>
+	<h2>Games:</h2>
+	<table>
+		<tr>
+			<th>No.</th>
+			<th>Game ID</th>
+			<th>Game name</th>
+			<th>Playtime</th>
+			<th>Achievement completion</th>
+		</tr>
+		{GAMES_ROWS}
+	</table>
+</body>
+</html>
