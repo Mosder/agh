@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, status
 from enum import Enum
 from fastapi.responses import JSONResponse
 
