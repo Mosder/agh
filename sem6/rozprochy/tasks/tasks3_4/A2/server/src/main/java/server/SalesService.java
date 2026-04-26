@@ -86,6 +86,8 @@ public class SalesService extends SalesSubscriptionServiceGrpc.SalesSubscription
         observer.setOnCancelHandler(() -> session.setObserver(null));
         session.setObserver(observer);
         session.sendBuffered();
+
+        System.out.println("Added client " + id + " with tags: " + tags);
     }
 
     @Override
@@ -94,21 +96,29 @@ public class SalesService extends SalesSubscriptionServiceGrpc.SalesSubscription
         clients.remove(id);
         response.onNext(com.google.protobuf.Empty.getDefaultInstance());
         response.onCompleted();
+
+        System.out.println("Removed client " + id);
     }
 
     @Override
     public void addTags(RequestData request, StreamObserver<com.google.protobuf.Empty> response) {
         String id = request.getClientId();
-        if (clients.containsKey(id)) clients.get(id).addTags(new HashSet<>(request.getTagsList()));
+        Set<String> tags = new HashSet<>(request.getTagsList());
+        if (clients.containsKey(id)) clients.get(id).addTags(tags);
         response.onNext(com.google.protobuf.Empty.getDefaultInstance());
         response.onCompleted();
+
+        System.out.println("Client " + id + " added tags: " + tags);
     }
 
     @Override
     public void removeTags(RequestData request, StreamObserver<com.google.protobuf.Empty> response) {
         String id = request.getClientId();
-        if (clients.containsKey(id)) clients.get(id).removeTags(new HashSet<>(request.getTagsList()));
+        Set<String> tags = new HashSet<>(request.getTagsList());
+        if (clients.containsKey(id)) clients.get(id).removeTags(tags);
         response.onNext(com.google.protobuf.Empty.getDefaultInstance());
         response.onCompleted();
+
+        System.out.println("Client " + id + " removed tags: " + tags);
     }
 }

@@ -89,7 +89,7 @@ def notification_thread(stub: gen_grpc.SalesSubscriptionServiceStub, lock: threa
             else:
                 break
 
-def run_client(id: str, tags: Tags, server: str = "127.0.0.1:50051") -> None:
+def run_client(id: str, tags: Tags, server: str = "127.0.0.2:50051") -> None:
     output_lock = threading.Lock()
     options = [
         ("grpc.keepalive_time_ms", 20000),
