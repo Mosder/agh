@@ -1,0 +1,17 @@
+Zadanie A2 - Subskrypcja na zdarzenia
+Wynikiem prac ma być aplikacja klient-serwer w technologii gRPC. Użytkownicy powinni móc dokonywać subskrypcji na pewnego rodzaju zdarzenia. To, o czym mają one informować jest w gestii Wykonawcy, np. o nadchodzącym wydarzeniu, którym jesteśmy zainteresowani ze względu na miejsce, czas, tematykę itp., o osiągnięciu określonych w żądaniu warunków pogodowych w danym miejscu, itp. Subskrypcja musi precyzyjnie określać zainteresowanie konkretnego użytkownika (np. oczywiste jest chyba, że nie chcemy się subskrybować na informację o wszelkich biegach maratońskich w najbliższy weekend na całym świecie).
+
+Dodatkowe informacje i wymagania:
+
+Na pojedyncze zdarzenie może się zasubskrybować wielu odbiorców naraz.
+Może istnieć wiele niezależnych subskrypcji (tj. np. na wiele różnych instancji spotkań). 
+Projektując protokół komunikacji pomiędzy stronami należy odpowiednio wykorzystać mechanizm strumieniowania (stream) - niedopuszczalny jest polling.
+Wiadomości mogą nadchodzić z różnymi odstępami czasowymi (w rzeczywistości nawet bardzo długimi), jednak na potrzeby demonstracji rozwiązania należy przyjąć interwał rzędu pojedynczych sekund.
+W definicji wiadomości przesyłanych do klienta należy wykorzystać pola liczbowe, enum, string, message, ew. oneof - wraz z co najmniej jednym modyfikatorem repeated. Etap subskrypcji powinien w jakiś sposób precyzować, które powiadomienia danej usługi (spośród wszystkich) są dla odbiorcy interesujące (np. obejmować wskazanie miasta, którego warunki pogodowe nas interesują i daty) i dany odbiorca powinien otrzymywać wyłącznie interesujące go powiadomienia.
+Dobrze widziana będzie możliwość odsubskrybowania się z notyfikacji o wcześniej zasubskrybowanych zdarzeniach bez konieczności odłączania się klienta (ale odłączenie się - także nagłe - musi pociągać za sobą zakończenie subskrypcji).
+Dla uproszczenia realizacji zadania można (nie trzeba) pominąć funkcjonalność samego tworzenia instancji wydarzeń lub miejsc, których dotyczy subskrypcja i notyfikacja - może to być zawarte w pliku konfiguracyjnym, a nawet kodzie źródłowym strony serwerowej. Treść wysyłanych zdarzeń może być wynikiem działania bardzo prostego generatora.
+W realizacji należy zadbać o odporność komunikacji na błędy sieciowe (które można symulować czasowym gwałtownym wyłączeniem klienta lub serwera lub włączeniem zapory sieciowej). Ustanie przerwy w łączności sieciowej musi pozwolić na ponowne ustanowienie komunikacji bez konieczności restartu procesów. Wiadomości przeznaczone do dostarczenia dla odbiorcy mają być buforowane przez serwer do czasu ponownego ustanowienia łączności (pożądana odporność na ataki DoS). Rozwiązanie musi być także "NAT-friendly" (tj. uwzględniać rozważane na laboratorium sytuacje związane z translacją adresów, w tym podtrzymywaniem aktywności w kanale komunikacyjnym) - co należy umieć udowodnić np. analizując komunikację sieciową.
+Technologia middleware: gRPC
+Języki programowania: dwa różne (jeden dla klienta, drugi dla serwera)
+Maksymalna punktacja: 12
+
