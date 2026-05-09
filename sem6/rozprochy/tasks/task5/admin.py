@@ -40,7 +40,7 @@ def run_admin() -> None:
 
     print("Started admin")
     while True:
-        command = input("Command (agencies|carriers|all <msg>):")
+        command = input("Command ([a]gencies|[c]arriers|all <msg>):")
         parts = command.split(" ", 1)
         if len(parts) != 2 or parts[0] not in ALLOWED_ARGS:
             print("Command not found")
