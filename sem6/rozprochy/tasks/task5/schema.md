@@ -56,6 +56,6 @@ flowchart LR
     QA --> A
     QC --> C
 
-    X --> MON[admin.monitor (#)]
+    X --> MON["admin.monitor (#)"]
     MON --> AD
 ```
