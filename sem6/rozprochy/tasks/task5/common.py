@@ -1,7 +1,7 @@
 import pika
 
 EXCHANGE_NAME = "exchange"
-SERVICES = set("human", "cargo", "satelite")
+SERVICES = set(["human", "cargo", "satelite"])
 
 # Make connection
 def make_connection() -> pika.BlockingConnection:
@@ -16,4 +16,4 @@ def setup_service_queues(channel: pika.adapters.blocking_connection.BlockingChan
     for service in SERVICES:
         queue_name = f"service.{service}"
         channel.queue_declare(queue=queue_name)
-        channel.queue_bind(exchange=EXCHANGE, queue=queue_name, routing_key=f"orders.{service}")
+        channel.queue_bind(exchange=EXCHANGE_NAME, queue=queue_name, routing_key=f"orders.{service}")

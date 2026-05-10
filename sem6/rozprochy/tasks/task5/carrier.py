@@ -1,13 +1,14 @@
 import sys
 import pika
 import json
+from time import sleep
 from common import EXCHANGE_NAME, make_connection, setup_exchange, setup_service_queues
 
 HUMAN_TRANSPORT_TIME_S = 1
 CARGO_TRANSPORT_TIME_S = 1
 PUT_SATELITE_TIME_S = 1
 
-ALLOWED_ARGS = set("human", "h", "cargo", "c", "satelite", "s")
+ALLOWED_ARGS = set(["human", "h", "cargo", "c", "satelite", "s"])
 EXPAND_ARGS_DICT = {"h": "human", "c": "cargo", "s": "satelite"}
 SERVICE_TO_TIME_S = {
     "human": HUMAN_TRANSPORT_TIME_S,
@@ -49,18 +50,20 @@ def handle_order(ch, method, props, body):
         "service": service,
         "carrier": carrier_name
     }
-    channel.basic_publish(
+    ch.basic_publish(
         exchange=EXCHANGE_NAME,
         routing_key=f"confirm.{agency}",
         body=json.dumps(confirmation)
     )
 
     print(f"Handled order {order_id} from agency {agency} and sent confirmation")
+    ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # Callback for handling admin messages
 def handle_admin_message(ch, method, props, body):
     data = json.loads(body.decode("utf-8"))
     print(f"[ADMIN]: {data["message"]}")
+    ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # Run carrier
 def run_carrier(services: set[str]) -> None:
@@ -80,8 +83,6 @@ def run_carrier(services: set[str]) -> None:
 
 
 if __name__ == "__main__":
-    global carrier_name
-
     if len(sys.argv) != 4:
         print("Wrong argument count")
         print("Arguments: <name> <service1> <service2>")

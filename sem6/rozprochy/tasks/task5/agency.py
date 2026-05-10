@@ -1,8 +1,9 @@
 import sys
+import json
 from threading import Thread
 from common import EXCHANGE_NAME, make_connection, setup_exchange, setup_service_queues
 
-ALLOWED_ARGS = set("human", "h", "cargo", "c", "satelite", "s")
+ALLOWED_ARGS = set(["human", "h", "cargo", "c", "satelite", "s"])
 EXPAND_ARGS_DICT = {"h": "human", "c": "cargo", "s": "satelite"}
 
 # Global agency name to be visible in callbacks
@@ -32,11 +33,13 @@ def handle_confirm(ch, method, props, body):
     carrier = data["carrier"]
 
     print(f"[CARRIER {carrier}]: Confirm order {order_id} for service {service}")
+    ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # Handle admin messages
 def handle_admin_message(ch, method, props, body):
     data = json.loads(body.decode("utf-8"))
     print(f"[ADMIN]: {data["message"]}")
+    ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # Thread for listening
 def listener() -> None:
@@ -53,7 +56,7 @@ def listener() -> None:
 # Run agency
 def run_agency() -> None:
     # Start thread for listening
-    listener_thread = Thread(target=listener, args=(,), daemon=True)
+    listener_thread = Thread(target=listener, args=(), daemon=True)
     listener_thread.start()
 
     # Commands thread here
@@ -65,19 +68,20 @@ def run_agency() -> None:
     print("Started agency")
     order_id = 1
     while True:
-        service = input("Input service ([h]uman, [c]argo, [s]atelite):")
+        service = input("Input service ([h]uman, [c]argo, [s]atelite): ")
         if service not in ALLOWED_ARGS:
             print(f"Unknown service")
             continue
+        service = EXPAND_ARGS_DICT.get(service, service)
 
         message = {
             "agency": agency_name,
             "order_id": order_id,
-            "service": EXPAND_ARGS_DICT.get(service, service)
+            "service": service
         }
         channel.basic_publish(
             exchange=EXCHANGE_NAME,
-            routing_key=f"orders.{command}",
+            routing_key=f"orders.{service}",
             body=json.dumps(message)
         )
 
@@ -85,8 +89,6 @@ def run_agency() -> None:
         order_id += 1
 
 if __name__ == "__main__":
-    global agency_name
-
     if len(sys.argv) != 2:
         print("Wrong argument count")
         print("Required arguments: <name>")

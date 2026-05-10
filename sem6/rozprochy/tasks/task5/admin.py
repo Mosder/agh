@@ -3,7 +3,7 @@ import json
 from threading import Thread
 from common import EXCHANGE_NAME, make_connection, setup_exchange
 
-ALLOWED_ARGS = set("agencies", "a", "carriers", "c", "all")
+ALLOWED_ARGS = set(["agencies", "a", "carriers", "c", "all"])
 EXPAND_ARGS_DICT = {"a": "agencies", "c": "carriers"}
 
 
@@ -18,6 +18,7 @@ def setup_monitor_queue(channel: pika.adapters.blocking_connection.BlockingChann
 def handle_monitor_message(ch, method, props, body):
     data = json.loads(body.decode("utf-8"))
     print(f"[MONITOR] key={method.routing_key}, body={data}")
+    ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # Thread for monitoring all messages
 def listener() -> None:
@@ -31,7 +32,7 @@ def listener() -> None:
 
 # Run admin
 def run_admin() -> None:
-    listener_thread = Thread(target=listener, args=(,), daemon=True)
+    listener_thread = Thread(target=listener, args=(), daemon=True)
     listener_thread.start()
 
     connection = make_connection()
@@ -40,7 +41,7 @@ def run_admin() -> None:
 
     print("Started admin")
     while True:
-        command = input("Command ([a]gencies|[c]arriers|all <msg>):")
+        command = input("Command ([a]gencies|[c]arriers|all <msg>): ")
         parts = command.split(" ", 1)
         if len(parts) != 2 or parts[0] not in ALLOWED_ARGS:
             print("Command not found")
