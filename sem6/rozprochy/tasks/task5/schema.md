@@ -6,14 +6,28 @@ flowchart LR
         QAD(admin.monitor)
     end
 
-    AD -- admin.&lt;target&gt; --> X
+    subgraph AGENCIES
+        direction TB
+        A[&lt;agency&gt;]
+        QA(confirmations.&lt;agency&gt;)
+        QAAD(admin.agencies.&lt;agency&gt;)
+    end
+
+    subgraph CARRIERS
+        direction TB
+        C[&lt;carrier&gt;]
+        QS(service.&lt;service&gt;)
+        QC(admin.carriers.&lt;carrier&gt;)
+    end
+
+    AD -- admin.&lt;target&gt; --> X[("Exchange (topic)")]
     X -- "#" --> QAD --> AD
 
-    A[&lt;agency&gt;] -- orders.&lt;service&gt; --> X[("Exchange (topic)")]
-    X -- confirm.&lt;agency&gt; --> QA(confirmations.&lt;agency&gt;) --> A
-    X -- admin.all / admin.agencies --> QAAD(admin.agencies.&lt;agency&gt;) --> A
+    A -- orders.&lt;service&gt; --> X
+    X -- confirm.&lt;agency&gt; --> QA --> A
+    X -- admin.all / admin.agencies --> QAAD --> A
 
-    C[&lt;carrier&gt;] -- confirm.&lt;agency&gt; --> X
-    X -- orders.&lt;service&gt; --> QS(service.&lt;service&gt;) --> C
-    X -- admin.all / admin.carriers --> QC(admin.carriers.&lt;carrier&gt;) --> C
+    C -- confirm.&lt;agency&gt; --> X
+    X -- orders.&lt;service&gt; --> QS --> C
+    X -- admin.all / admin.carriers --> QC --> C
 ```
