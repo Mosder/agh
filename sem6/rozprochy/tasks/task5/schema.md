@@ -1,46 +1,61 @@
+# Schemat działania aplikacji
+
+System składa się z 3 ról komunikujących się przez RabbitMQ (`topic exchange` o nazwie `exchange`):
+- **Agency** – składa zamówienia na usługi.
+- **Carrier** – realizuje zamówienia i odsyła potwierdzenia.
+- **Admin** – wysyła komunikaty administracyjne oraz monitoruje ruch.
+
+## Kolejki i routing key
+
+| Element | Kolejka | Routing key |
+|---|---|---|
+| Zamówienia usług | `service.human`, `service.cargo`, `service.satelite` | `orders.<service>` |
+| Potwierdzenia dla agencji | `confirmations.<agency>` | `confirm.<agency>` |
+| Komunikaty admin do agencji | `admin.agencies.<agency>` | `admin.agencies`, `admin.all` |
+| Komunikaty admin do carrierów | `admin.carriers.<carrier>` | `admin.carriers`, `admin.all` |
+| Monitoring admina | `admin.monitor` | `#` (wszystko) |
+
+## Przepływ działania
+
+1. **Agency** uruchamia wątek nasłuchu:
+   - odbiera potwierdzenia (`confirm.<agency>`),
+   - odbiera komunikaty admina (`admin.agencies` i `admin.all`).
+2. W głównej pętli **Agency** wybiera usługę (`human/cargo/satelite`) i publikuje zamówienie:
+   - `routing_key = orders.<service>`
+   - payload: `agency`, `order_id`, `service`.
+3. **Carrier** obsługuje dokładnie 2 różne usługi i subskrybuje odpowiednie kolejki `service.<service>`.
+4. Po odebraniu zamówienia **Carrier**:
+   - przetwarza je,
+   - wysyła potwierdzenie do agencji:
+     - `routing_key = confirm.<agency>`
+     - payload: `order_id`, `service`, `carrier`.
+5. **Admin**:
+   - wysyła komunikaty do `admin.agencies`, `admin.carriers` albo `admin.all`,
+   - równolegle nasłuchuje `admin.monitor` (związanej z `#`) i widzi wszystkie wiadomości przechodzące przez exchange.
+
+## Diagram (Mermaid)
+
+```mermaid
 flowchart LR
-   %% Użytkownicy
-   A[Agencja: A1]
-   C[Przewoźnik: C1<br/>(obsługuje: human + cargo)]
-   D[Administrator]
+    A[Agency] -- orders.<service> --> X[(RabbitMQ topic exchange: exchange)]
+    X --> SH[service.human]
+    X --> SC[service.cargo]
+    X --> SS[service.satelite]
 
-   %% RabbitMQ
-   X{{Topic Exchange<br/>exchange}}
+    SH --> C[Carrier]
+    SC --> C
+    SS --> C
 
-   QH[(service.human)]
-   QC[(service.cargo)]
-   QS[(service.satelite)]
-   QCONF[(confirmations.A1)]
-   QA[(admin.agencies.A1)]
-   QCAR[(admin.carriers.C1)]
-   QMON[(admin.monitor)]
+    C -- confirm.<agency> --> X
+    X --> QCONF[confirmations.<agency>]
+    QCONF --> A
 
-   %% Bindings (kolejki -> exchange)
-   X -- "orders.human" --> QH
-   X -- "orders.cargo" --> QC
-   X -- "orders.satelite" --> QS
-   X -- "confirm.A1" --> QCONF
-   X -- "admin.agencies" --> QA
-   X -- "admin.all" --> QA
-   X -- "admin.carriers" --> QCAR
-   X -- "admin.all" --> QCAR
-   X -- "#" --> QMON
+    AD[Admin] -- admin.agencies / admin.carriers / admin.all --> X
+    X --> QA[admin.agencies.<agency>]
+    X --> QC[admin.carriers.<carrier>]
+    QA --> A
+    QC --> C
 
-   %% Publikacja zleceń przez agencję
-   A -- "publish: orders.human / orders.cargo / orders.satelite" --> X
-
-   %% Konsumpcja zleceń przez przewoźnika (2 z 3 usług)
-   QH -- "consume" --> C
-   QC -- "consume" --> C
-
-   %% Potwierdzenie wykonania
-   C -- "publish: confirm.A1" --> X
-   QCONF -- "consume" --> A
-
-   %% Moduł admina
-   D -- "publish: admin.agencies / admin.carriers / admin.all" --> X
-   QA -- "consume" --> A
-   QCAR -- "consume" --> C
-
-   %% Monitoring premium (kopia wszystkich wiadomości)
-   QMON -- "consume" --> D
+    X --> MON[admin.monitor (#)]
+    MON --> AD
+```
