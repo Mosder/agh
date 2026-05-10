@@ -2,8 +2,8 @@
 flowchart LR
     subgraph ADMIN
         direction TB
-        QAD(admin.monitor)
         AD[Admin]
+        QAD(admin.monitor)
     end
 
     AD -- admin.&lt;target&gt; --> X
