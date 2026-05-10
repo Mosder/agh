@@ -1,5 +1,5 @@
 ```mermaid
-flowchart TB
+flowchart LR
     subgraph ADMIN
         direction LR
         AD[Admin]
