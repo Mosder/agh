@@ -14,5 +14,5 @@ flowchart LR
     X -- admin.all --> A
     X -- admin.all --> C
 
-    X -- "admin.monitor (#)" --> AD
+    X -- "#" --> AD
 ```
