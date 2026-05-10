@@ -6,6 +6,9 @@ from common import EXCHANGE_NAME, make_connection, setup_exchange
 ALLOWED_ARGS = set(["agencies", "a", "carriers", "c", "all"])
 EXPAND_ARGS_DICT = {"a": "agencies", "c": "carriers"}
 
+# Prints allowed commands
+def print_help() -> None:
+    print("\nCommand ([a]gencies|[c]arriers|all <msg>):")
 
 # Setup monitoring queue
 def setup_monitor_queue(channel: pika.adapters.blocking_connection.BlockingChannel) -> str:
@@ -18,6 +21,7 @@ def setup_monitor_queue(channel: pika.adapters.blocking_connection.BlockingChann
 def handle_monitor_message(ch, method, props, body):
     data = json.loads(body.decode("utf-8"))
     print(f"[MONITOR] key={method.routing_key}, body={data}")
+    print_help()
     ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # Thread for monitoring all messages
@@ -41,7 +45,8 @@ def run_admin() -> None:
 
     print("Started admin")
     while True:
-        command = input("Command ([a]gencies|[c]arriers|all <msg>): ")
+        print_help()
+        command = input()
         parts = command.split(" ", 1)
         if len(parts) != 2 or parts[0] not in ALLOWED_ARGS:
             print("Command not found")

@@ -9,6 +9,10 @@ EXPAND_ARGS_DICT = {"h": "human", "c": "cargo", "s": "satelite"}
 # Global agency name to be visible in callbacks
 agency_name = None
 
+# Print allowed commands
+def print_help() -> None:
+    print("\nInput service ([h]uman, [c]argo, [s]atelite):")
+
 # Setup confirmation queue
 def setup_confirmation_queue(channel: pika.adapters.blocking_connection.BlockingChannel) -> str:
     queue_name = f"confirmations.{agency_name}"
@@ -33,12 +37,14 @@ def handle_confirm(ch, method, props, body):
     carrier = data["carrier"]
 
     print(f"[CARRIER {carrier}]: Confirm order {order_id} for service {service}")
+    print_help()
     ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # Handle admin messages
 def handle_admin_message(ch, method, props, body):
     data = json.loads(body.decode("utf-8"))
     print(f"[ADMIN]: {data["message"]}")
+    print_help()
     ch.basic_ack(delivery_tag = method.delivery_tag)
 
 # Thread for listening
@@ -68,7 +74,8 @@ def run_agency() -> None:
     print("Started agency")
     order_id = 1
     while True:
-        service = input("Input service ([h]uman, [c]argo, [s]atelite): ")
+        print_help()
+        service = input()
         if service not in ALLOWED_ARGS:
             print(f"Unknown service")
             continue
