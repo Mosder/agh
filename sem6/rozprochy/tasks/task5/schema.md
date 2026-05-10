@@ -1,20 +1,20 @@
 ```mermaid
-flowchart LR
+flowchart TB
     subgraph ADMIN
-        direction TB
+        direction LR
         AD[Admin]
         QAD(admin.monitor)
     end
 
     subgraph AGENCIES
-        direction TB
+        direction LR
         A[&lt;agency&gt;]
         QA(confirmations.&lt;agency&gt;)
         QAAD(admin.agencies.&lt;agency&gt;)
     end
 
     subgraph CARRIERS
-        direction TB
+        direction LR
         C[&lt;carrier&gt;]
         QS(service.&lt;service&gt;)
         QC(admin.carriers.&lt;carrier&gt;)
