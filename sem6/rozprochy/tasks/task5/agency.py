@@ -1,7 +1,7 @@
 import sys
 import json
 from threading import Thread
-from common import EXCHANGE_NAME, make_connection, setup_exchange, setup_service_queues
+from common import EXCHANGE_NAME, make_connection, setup_exchange
 
 ALLOWED_ARGS = set(["human", "h", "cargo", "c", "satelite", "s"])
 EXPAND_ARGS_DICT = {"h": "human", "c": "cargo", "s": "satelite"}
@@ -69,7 +69,6 @@ def run_agency() -> None:
     connection = make_connection()
     channel = connection.channel()
     setup_exchange(channel)
-    setup_service_queues(channel)
 
     print("Started agency")
     order_id = 1

@@ -2,7 +2,7 @@ import sys
 import pika
 import json
 from time import sleep
-from common import EXCHANGE_NAME, make_connection, setup_exchange, setup_service_queues
+from common import EXCHANGE_NAME, SERVICES, make_connection, setup_exchange
 
 HUMAN_TRANSPORT_TIME_S = 0
 CARGO_TRANSPORT_TIME_S = 0
@@ -25,6 +25,13 @@ def create_services_set(arg1: str, arg2: str) -> set[str]:
     services.add(EXPAND_ARGS_DICT.get(arg1, arg1))
     services.add(EXPAND_ARGS_DICT.get(arg2, arg2))
     return services
+
+# Setup service queues
+def setup_service_queues(channel: pika.adapters.blocking_connection.BlockingChannel) -> None:
+    for service in SERVICES:
+        queue_name = f"service.{service}"
+        channel.queue_declare(queue=queue_name)
+        channel.queue_bind(exchange=EXCHANGE_NAME, queue=queue_name, routing_key=f"orders.{service}")
 
 # Setup queue for messages from admin
 def setup_admin_queue(channel: pika.adapters.blocking_connection.BlockingChannel, name: str) -> str:

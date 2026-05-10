@@ -1,18 +1,23 @@
 ```mermaid
 flowchart LR
-    A[Agency] -- orders.&lt;service&gt; --> X[("Exchange (topic)")]
-    X -- service.human --> C[Carrier]
-    X -- service.cargo --> C
-    X -- service.satelite --> C
+    AD[Admin] -- admin.&lt;target&gt; --> X[("Exchange (topic)")]
+    X -- "#" --> QAD(admin.monitor) --> AD
 
-    C -- confirm.&lt;agency&gt; --> X
-    X -- confirm.&lt;agency&gt; --> A
+    A1[agency1] -- orders.&lt;service&gt; --> X
+    X -- confirm.agency1 --> QA1(confirmations.agency1) --> A1
+    X -- admin.all / admin.agencies --> QA1AD(admin.agencies.%lt;agency1%gt;) --> A1
 
-    AD[Admin] -- admin.agencies / admin.carriers / admin.all --> X
-    X -- admin.agencies --> A
-    X -- admin.carriers --> C
-    X -- admin.all --> A
-    X -- admin.all --> C
+    A2[agency2] -- orders.&lt;service&gt; --> X
+    X -- confirm.agency2 --> QA2(confirmations.agency2) --> A2
+    X -- admin.all / admin.agencies --> QA2AD(admin.agencies.%lt;agency2%gt;) --> A2
 
-    X -- "#" --> AD
+    C1[carrier1] -- confirm.&lt;agency&gt; --> X
+    X -- orders.human --> QSH(service.human) --> C1
+    X -- orders.cargo --> QSC(service.cargo) --> C1
+    X -- admin.all / admin.carriers --> QC1(admin.carriers.&lt;carrier1&gt;) --> C1
+
+    C2[carrier2] -- confirm.&lt;agency&gt; --> X
+    QSC --> C2
+    X -- orders.satelite --> QSC(service.satelite) --> C2
+    X -- admin.all / admin.carriers --> QC2(admin.carriers.&lt;carrier2&gt;) --> C2
 ```
