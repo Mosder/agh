@@ -7,7 +7,7 @@ flowchart LR
     end
 
     subgraph AGENCIES
-        direction LR
+        direction RL
         A[&lt;agency&gt;]
         QA(confirmations.&lt;agency&gt;)
         QAAD(admin.agencies.&lt;agency&gt;)
