@@ -18,6 +18,6 @@ flowchart LR
 
     C2[carrier2] -- confirm.&lt;agency&gt; --> X
     QSC --> C2
-    X -- orders.satelite --> QSC(service.satelite) --> C2
+    X -- orders.satelite --> QSS(service.satelite) --> C2
     X -- admin.all / admin.carriers --> QC2(admin.carriers.&lt;carrier2&gt;) --> C2
 ```
