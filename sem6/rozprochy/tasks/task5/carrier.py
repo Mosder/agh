@@ -4,9 +4,9 @@ import json
 from time import sleep
 from common import EXCHANGE_NAME, make_connection, setup_exchange, setup_service_queues
 
-HUMAN_TRANSPORT_TIME_S = 1
-CARGO_TRANSPORT_TIME_S = 1
-PUT_SATELITE_TIME_S = 1
+HUMAN_TRANSPORT_TIME_S = 0
+CARGO_TRANSPORT_TIME_S = 0
+PUT_SATELITE_TIME_S = 0
 
 ALLOWED_ARGS = set(["human", "h", "cargo", "c", "satelite", "s"])
 EXPAND_ARGS_DICT = {"h": "human", "c": "cargo", "s": "satelite"}
@@ -69,6 +69,7 @@ def handle_admin_message(ch, method, props, body):
 def run_carrier(services: set[str]) -> None:
     connection = make_connection()
     channel = connection.channel()
+    channel.basic_qos(prefetch_count=1)
 
     setup_exchange(channel)
     setup_service_queues(channel)
