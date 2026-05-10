@@ -1,7 +1,10 @@
 ```mermaid
 flowchart LR
-    AD[Admin] -- admin.&lt;target&gt; --> X
-    X -- "#" --> QAD(admin.monitor) --> AD
+    subgraph ADMIN
+        direction RL
+        AD[Admin] -- admin.&lt;target&gt; --> X
+        X -- "#" --> QAD(admin.monitor) --> AD
+    end
 
     A[&lt;agency&gt;] -- orders.&lt;service&gt; --> X[("Exchange (topic)")]
     X -- confirm.&lt;agency&gt; --> QA(confirmations.&lt;agency&gt;) --> A
