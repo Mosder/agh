@@ -1,6 +1,6 @@
 ```mermaid
 flowchart LR
-    A[Agency] -- "orders.<service>" --> X[exchange]
+    A[Agency] -- orders.&lt;service&gt; --> X[(Topic exchange)]
     X --> SH[service.human]
     X --> SC[service.cargo]
     X --> SS[service.satelite]
@@ -9,13 +9,13 @@ flowchart LR
     SC --> C
     SS --> C
 
-    C -- confirm.<agency> --> X
-    X --> QCONF["confirmations.<agency>"]
+    C -- confirm.&lt;agency&gt; --> X
+    X --> QCONF[confirmations.&lt;agency&gt;]
     QCONF --> A
 
     AD[Admin] -- admin.agencies / admin.carriers / admin.all --> X
-    X --> QA["admin.agencies.<agency>"]
-    X --> QC["admin.carriers.<carrier>"]
+    X --> QA[admin.agencies.&lt;agency&gt;]
+    X --> QC[admin.carriers.&lt;carrier&gt;]
     QA --> A
     QC --> C
 
