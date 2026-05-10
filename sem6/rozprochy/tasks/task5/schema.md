@@ -1,26 +1,22 @@
 ```mermaid
 flowchart LR
     subgraph ADMIN
-        direction LR
+        direction TD
         AD[Admin]
         QAD(admin.monitor)
     end
 
-    subgraph AGENCIES
-        direction RL
-        A[&lt;agency&gt;]
-        QA(confirmations.&lt;agency&gt;)
-        QAAD(admin.agencies.&lt;agency&gt;)
-    end
+    X[("Exchange (topic)")]
 
-    subgraph CARRIERS
-        direction LR
-        C[&lt;carrier&gt;]
-        QS(service.&lt;service&gt;)
-        QC(admin.carriers.&lt;carrier&gt;)
-    end
+    A[&lt;agency&gt;]
+    QA(confirmations.&lt;agency&gt;)
+    QAAD(admin.agencies.&lt;agency&gt;)
 
-    AD -- admin.&lt;target&gt; --> X[("Exchange (topic)")]
+    C[&lt;carrier&gt;]
+    QS(service.&lt;service&gt;)
+    QC(admin.carriers.&lt;carrier&gt;)
+
+    AD -- admin.&lt;target&gt; --> X
     X -- "#" --> QAD --> AD
 
     A -- orders.&lt;service&gt; --> X
